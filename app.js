@@ -31,7 +31,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const passport = require("passport");
 
-const PORT = process.env.PORT || 4005;
+const PORT = process.env.PORT || 8000;
 
 const db = new Database(process.env.MONGODB_URI, {
   useNewUrlParser: true,
@@ -49,7 +49,7 @@ app.use(
   "/assets/userAvatars",
   express.static(__dirname + "/assets/userAvatars")
 );
-
+app.use(express.static('dist'))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
