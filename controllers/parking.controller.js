@@ -27,6 +27,7 @@ exports.get_parking_by_parkingId = async (req, res) => {
 
 exports.create_new_parking = async (req, res) => {
     try {
+      console.log("testing...123");
       await createParking(req, res);
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
@@ -44,8 +45,10 @@ exports.create_new_parking = async (req, res) => {
 
   exports.update_parking = async (req, res) => {
     try {
+      console.log("testing45.....");
       await updateParking(req, res);
     } catch (error) {
+      console.log("testoing...23");
       res.status(500).json({ error: 'Internal server error' });
     }
   };

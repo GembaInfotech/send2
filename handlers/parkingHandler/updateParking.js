@@ -2,12 +2,13 @@ const ParkingModel = require("../../models/parking.model")
 
 exports.updateParking = async (req, res) => {
     try {
-        console.log(req.body, req.params, req.userId);
+        // console.log(req.body, req.params, req.userId);
+        console.log("testing35");
         const vendor_id = req.userId
       const {parking_id} = req.params;
       console.log(vendor_id, parking_id);
 
-      const parkingDataToUpdate = req.body;
+      const parkingDataToUpdate = req.body.updatedData;
   
       // Check if the vendor ID is valid
       const isValidVendor = await ParkingModel.exists({ _id: parking_id, vendor_id: vendor_id });

@@ -67,9 +67,9 @@ app.use("/posts", postRoutes);
 app.use("/communities", communityRoutes);
 app.use("/admin", adminRoutes);
 app.use("/vehicle", vehcileRoutes);
-app.use("/parking", parkingRoutes)
+app.use("/api/parking", parkingRoutes)
 app.use("/booking", bookingRoutes)
-app.use("/vendor", vendorRoute)
+app.use("/api/vendor", vendorRoute)
 app.use("/booking", paymentRoute)
 app.use("/guard", guardRoutes)
 

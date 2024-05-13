@@ -2,9 +2,8 @@ const ParkingModel = require('../../models/parking.model')
 
 exports.getParkingByParkingId = async (req, res) => {
   try {
-    console.log("testing...1");
-    const {parkingId} = req.params; // Assuming the parking ID is passed in the URL params
-    const parking = await ParkingModel.findOne({_id:parkingId});
+    const {parking_id} = req.params;
+    const parking = await ParkingModel.findOne({_id:parking_id});
     console.log(parking);
     if (!parking) {
       return res.status(404).json({

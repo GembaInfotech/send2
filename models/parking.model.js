@@ -112,7 +112,7 @@ const ParkingSchema = new Schema(
     exceed_price_for: {
       type: Number,
       enum:[10,20,30],
-      required: true,
+      required: false,
     },
     
    
