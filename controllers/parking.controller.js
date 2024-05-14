@@ -4,6 +4,9 @@ const {updateParkingStatus} = require("../handlers/parkingHandler/updateParkingS
 const {getVendorParkings} = require("../handlers/parkingHandler/getVendorParkings")
 const {updateParking} = require('../handlers/parkingHandler/updateParking')
 const {getParkingByParkingId} = require('../handlers/parkingHandler/getParkingByParkingId')
+const {getParkingByGuardId} = require('../handlers/parkingHandler/getParkingByGuardId')
+// const getParkingByParkingId 
+
 
 exports.view_Parking_list = async (req, res) => {
   try {
@@ -16,8 +19,19 @@ exports.view_Parking_list = async (req, res) => {
 exports.get_parking_by_parkingId = async (req, res) => {
   try {
 
-    console.log("testing...2");
+    // console.log("testing...2");
     await getParkingByParkingId(req, res);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+exports.get_parking_by_guardId = async (req, res) => {
+  try {
+
+    console.log("testing...2");
+    await getParkingByGuardId(req, res);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }

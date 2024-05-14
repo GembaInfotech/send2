@@ -5,7 +5,7 @@ exports.createParking = async (req, res) => {
       // console.log("testing....1");
       // console.log(req.userId);
       // console.log(req.body.ParkingData);
-      let parkingData = req.body.ParkingData;
+      let parkingData = req.body;
       parkingData["vendor_id"] = req.userId;
       parkingData.vendorId = req.userId;
 

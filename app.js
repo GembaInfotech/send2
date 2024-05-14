@@ -71,7 +71,7 @@ app.use("/api/parking", parkingRoutes)
 app.use("/booking", bookingRoutes)
 app.use("/api/vendor", vendorRoute)
 app.use("/booking", paymentRoute)
-app.use("/guard", guardRoutes)
+app.use("/api/guard", guardRoutes)
 
 
 

@@ -2,12 +2,21 @@
 const router = require("express").Router();
 const guardController = require('../controllers/guard.controller')
 
-const decodeToken = require("../middlewares/auth/decodeToken");
+
+// const decodeToken = require("../middlewares/auth/decodeToken");
 
 
-// router.route('/create-new-guard').post(guardController.addGuard);
+router.route('/create-new-guard/:parkingid').post(guardController.addGuard);
 
-// router.route('/guard-login').post( guardController.signin);
+router.route('/guard-login').post( guardController.signin);
+router.route('/get-guard/:guardId').get( guardController.getGuard);
+router.route('/update-guard/:guardId').put( guardController.updateGuard);
+
+
+
+
+
+
 // router.route('/get-guard').get(decodeToken,guardController.getGuard);
 // router.route('/get-all-guard').get(guardController.getAllGuards);
 

@@ -6,10 +6,8 @@ exports.createBooking = async (req, res) => {
     console.log(req.body)
     console.log(user);
     const {
-      
       parking,
       inTime,
-     
     
     
     } = req.body.bookingData;
