@@ -67,24 +67,24 @@ const signin = async (req, res, next) => {
         });
       }
   
-    //   const isPasswordCorrect = await bcrypt.compare(
-    //     password,
-    //     existingGuard.password
-    //   );
+      // const isPasswordCorrect = await bcrypt.compare(
+      //   password,
+      //   existingGuard.password
+      // );
   
-    //   console.log(existingGuard.password);
+      // console.log(existingGuard.password);
   
-    //   if (!isPasswordCorrect) {
-    //     await saveLogInfo(
-    //       req,
-    //       MESSAGE.INCORRECT_PASSWORD,
-    //       LOG_TYPE.SIGN_IN,
-    //       LEVEL.ERROR
-    //     );
-    //     return res.status(400).json({
-    //       message: "Invalid credentials",
-    //     });
-    //   }
+      // if (!isPasswordCorrect) {
+      //   await saveLogInfo(
+      //     req,
+      //     MESSAGE.INCORRECT_PASSWORD,
+      //     LOG_TYPE.SIGN_IN,
+      //     LEVEL.ERROR
+      //   );
+      //   return res.status(400).json({
+      //     message: "Invalid credentials",
+      //   });
+      // }
   
       const payload = {
         id: existingGuard._id,
