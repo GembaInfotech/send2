@@ -7,7 +7,7 @@ const router = require("express").Router();
   router.route('/view-booking-list').get(decodeToken, bookingController.view_booking_list);
   router.route('/get-booking-by-query').get(bookingController.get_booking_by_query);
 
-  router.route('/create-new-booking').post(decodeToken,bookingController.create_new_booking);
+  router.route('/create-new-booking').post(bookingController.create_new_booking);
   router.route('/incoming-booking-status').put(decodeToken, bookingController.Incoming_booking_status);
   // router.route('/create-new-booking').post(decodeToken,bookingController.create_new_booking);
 

@@ -8,7 +8,7 @@ exports.getBookingsByQuery = async (req, res, next) => {
         // Build the query object
         const query = {};
         if (parkingid) {
-            query.parking_id = parkingid;
+            query.parking = parkingid;
         }
         if (status) {
             query.status = status;
@@ -16,6 +16,7 @@ exports.getBookingsByQuery = async (req, res, next) => {
 
         // Fetch bookings based on query
         const bookings = await BookingModel.find(query);
+        console.log(bookings);
 
         res.status(200).json({ bookings });
     } catch (error) {
