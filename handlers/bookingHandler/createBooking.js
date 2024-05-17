@@ -1,4 +1,5 @@
 const BookingModel = require('../../models/booking.model');
+const moment = require('moment');
 
 // exports.createBooking = async (req, res) => {
 //   try {
@@ -32,7 +33,7 @@ const BookingModel = require('../../models/booking.model');
 //   }
 // };
 
-exports.createBooking = async (req, res, next) => {
+exports.createBooking = async (req, res) => {
     try {
         const {
             // user,
@@ -41,23 +42,21 @@ exports.createBooking = async (req, res, next) => {
             outTime,
             // actualInTime,
             // actualOutTime,
-            // duration,
-            // actualDuration,
-            // BookingDate,
-            // exceedTime,
             vehicleNumber,
             price,
-            // cgst,
-            // sgst,
-            // exceedPrice,
-            // exceedCGST,
-            // exceedSGST,
-            // exceedTotalPrice,
-            // totalPrice,
-            // bookingPrice,
-            // paymentId,
             status
         } = req.body;
+
+        // Calculate duration
+        const intimeMoment = moment(inTime, 'YYYY-MM-DD HH:mm:ss');
+        const outtimeMoment = moment(outTime, 'YYYY-MM-DD HH:mm:ss');
+        const duration = moment.duration(outtimeMoment.diff(intimeMoment)).humanize();
+        const BookingDate = moment().format('YYYY-MM-DD HH:mm:ss');
+
+        // Calculate GST
+        const cgst = price * 0.09;
+        const sgst = price * 0.09;
+        const bookingDate = moment().format('YYYY-MM-DD HH:mm:ss');
 
         // Create a new booking instance
         const newBooking = new BookingModel({
@@ -67,14 +66,15 @@ exports.createBooking = async (req, res, next) => {
             outTime,
             // actualInTime,
             // actualOutTime,
-            // duration,
+            duration,
             // actualDuration,
-            // BookingDate,
+            BookingDate,
+            // BookingDate is automatically set to current date
             // exceedTime,
             vehicleNumber,
             price,
-            // cgst,
-            // sgst,
+            cgst,
+            sgst,
             // exceedPrice,
             // exceedCGST,
             // exceedSGST,
@@ -95,5 +95,8 @@ exports.createBooking = async (req, res, next) => {
             message: "Failed to create booking",
         });
     }
-};
+}
+
+
+
 
