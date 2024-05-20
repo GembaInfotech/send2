@@ -101,8 +101,8 @@ const ParkingSchema = new Schema(
       },
       price_for: {
         type: Number,
-        min:30,
-        max:480,
+        min:1,
+        max:24,
         required: false,
       },
       mobile_no:{

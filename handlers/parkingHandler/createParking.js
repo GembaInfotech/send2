@@ -4,12 +4,13 @@ exports.createParking = async (req, res) => {
     try {
       // console.log("testing....1");
       // console.log(req.userId);
-      // console.log(req.body.ParkingData);
-      let parkingData = req.body;
+      console.log(req.body.ParkingData);
+      let parkingData = req.body.ParkingData;
       parkingData["vendor_id"] = req.userId;
       parkingData.vendorId = req.userId;
 
-
+      console.log(req.userId);
+      console.log();
       // console.log(parkingData);
       const newParking = new ParkingModel(parkingData);
       // console.log("newParking", newParking);

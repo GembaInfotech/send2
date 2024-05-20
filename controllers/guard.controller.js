@@ -119,7 +119,7 @@ const signin = async (req, res, next) => {
         accessToken,
       });
       await newRefreshToken.save();
-  
+      console.log(existingGuard.parking);
       res.status(200).json({
         accessToken,
         refreshToken,
@@ -128,6 +128,7 @@ const signin = async (req, res, next) => {
           _id: existingGuard._id,
           name: existingGuard.name,
           email: existingGuard.email,
+          parking:existingGuard.parking
         },
       });
     } catch (err) {
@@ -144,47 +145,96 @@ const signin = async (req, res, next) => {
     }
   };
   
-  const addGuard = async (req, res, next) => {
-    try {
-        const guardData = { ...req.body };
-        console.log(guardData);
+//   const addGuard = async (req, res, next) => {
+//     try {
+//         const guardData = { ...req.body };
+//         console.log(guardData);
 
-        const existingGuard = await GuardModel.findOne({ email: guardData.email });
-        console.log("exist", existingGuard);
+//         const existingGuard = await GuardModel.findOne({ email: guardData.email });
+//         console.log("exist", existingGuard);
 
-        if (existingGuard) {
-            return res.status(400).json({
-                message: "Email already exists",
-            });
-        }
+//         if (existingGuard) {
+//             return res.status(400).json({
+//                 message: "Email already exists",
+//             });
+//         }
 
-        // Hash the password before saving
-        const hashedPassword = await bcrypt.hash(guardData.password, 10);
+//         // Hash the password before saving
+//         const hashedPassword = await bcrypt.hash(guardData.password, 10);
 
-        const newGuard = new GuardModel({
-            ...guardData,
-            password: hashedPassword,
-        });
+//         const newGuard = new GuardModel({
+//             ...guardData,
+//             password: hashedPassword,
+//         });
 
-        console.log("New Guard: ", newGuard);
-        await newGuard.save();
+//         console.log("New Guard: ", newGuard);
+//         await newGuard.save();
 
-        const updatedParkingDetail = await ParkingModel.findOneAndUpdate(
-            { _id: req.params.parkingid },
-            { $push: { guard_id: newGuard._id } },
-            { new: true }
-        );
+//         const updatedParkingDetail = await ParkingModel.findOneAndUpdate(
+//             { _id: req.params.parkingid },
+//             { $push: { guard_id: newGuard._id } },
+//             { new: true }
+//         );
 
-        res.status(200).json({
-            data: newGuard,
-            updatedParkingDetail
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Failed to add Guard",
-        });
-    }
+//         res.status(200).json({
+//             data: newGuard,
+//             updatedParkingDetail
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({
+//             message: "Failed to add Guard",
+//         });
+//     }
+// };
+
+
+const addGuard = async (req, res, next) => {
+  try {
+      const guardData = { ...req.body };
+      const vendor = req.userId
+      console.log(guardData);
+
+      const existingGuard = await GuardModel.findOne({ email: guardData.email });
+      console.log("exist", existingGuard);
+
+      if (existingGuard) {
+          return res.status(400).json({
+              message: "Email already exists",
+          });
+      }
+
+      // Hash the password before saving
+      const hashedPassword = await bcrypt.hash(guardData.password, 10);
+
+      // Include the parking ID in guard data
+      const newGuard = new GuardModel({
+          ...guardData,
+          password: hashedPassword,
+          parking: req.params.parkingid,
+          vendor:req.userId
+           // Assuming parking ID is passed as a parameter
+      });
+
+      console.log("New Guard: ", newGuard);
+      await newGuard.save();
+
+      const updatedParkingDetail = await ParkingModel.findOneAndUpdate(
+          { _id: req.params.parkingid },
+          { $push: { guard_id: newGuard._id } },
+          { new: true }
+      );
+
+      res.status(200).json({
+          data: newGuard,
+          // updatedParkingDetail
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({
+          message: "Failed to add Guard",
+      });
+  }
 };
 
 const getGuard = async (req, res, next) => {
@@ -214,6 +264,7 @@ const getGuard = async (req, res, next) => {
 
 const updateGuard = async (req, res, next) => {
     try {
+      // const vendor = req.userId;
         const guardId = req.params.guardId; 
         const guard = await GuardModel.findById(guardId);
         console.log(req.body);
@@ -229,7 +280,7 @@ const updateGuard = async (req, res, next) => {
         guard.address = req.body.data.address || guard.address;
         // guard.aadhar = req.body.aadhar || guard.aadhar;
         guard.contact = req.body.data.contact || guard.contact;
-    
+        guard.active = req.body.data.active || guard.active;
         await guard.save();
 
         res.status(200).json({
@@ -244,10 +295,34 @@ const updateGuard = async (req, res, next) => {
     }
 };
 
+const getAllGuardsByVendorId = async (req, res, next) => {
+  try {
+    const vendorId = req.userId; // Assuming req.userId contains the vendor ID
+    const guards = await GuardModel.find({ vendor: vendorId });
+
+    if (!guards || guards.length === 0) {
+      return res.status(404).json({
+        message: "No guards found for this vendor",
+      });
+    }
+
+    res.status(200).json({
+      message: "Guards found for this vendor",
+      data: guards,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to fetch guards for this vendor",
+    });
+  }
+};
+
   module.exports = {
     addGuard,
     signin,
     getGuard,
-    updateGuard  
+    updateGuard ,
+    getAllGuardsByVendorId 
   };
   
