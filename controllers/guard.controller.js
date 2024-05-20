@@ -192,6 +192,7 @@ const signin = async (req, res, next) => {
 const addGuard = async (req, res, next) => {
   try {
       const guardData = { ...req.body };
+      const vendor = req.userId
       console.log(guardData);
 
       const existingGuard = await GuardModel.findOne({ email: guardData.email });
@@ -210,7 +211,9 @@ const addGuard = async (req, res, next) => {
       const newGuard = new GuardModel({
           ...guardData,
           password: hashedPassword,
-          parking: req.params.parkingid, // Assuming parking ID is passed as a parameter
+          parking: req.params.parkingid,
+          vendor:req.userId
+           // Assuming parking ID is passed as a parameter
       });
 
       console.log("New Guard: ", newGuard);
@@ -261,6 +264,7 @@ const getGuard = async (req, res, next) => {
 
 const updateGuard = async (req, res, next) => {
     try {
+      // const vendor = req.userId;
         const guardId = req.params.guardId; 
         const guard = await GuardModel.findById(guardId);
         console.log(req.body);
@@ -276,7 +280,7 @@ const updateGuard = async (req, res, next) => {
         guard.address = req.body.data.address || guard.address;
         // guard.aadhar = req.body.aadhar || guard.aadhar;
         guard.contact = req.body.data.contact || guard.contact;
-    
+        guard.active = req.body.data.active || guard.active;
         await guard.save();
 
         res.status(200).json({
@@ -291,10 +295,34 @@ const updateGuard = async (req, res, next) => {
     }
 };
 
+const getAllGuardsByVendorId = async (req, res, next) => {
+  try {
+    const vendorId = req.userId; // Assuming req.userId contains the vendor ID
+    const guards = await GuardModel.find({ vendor: vendorId });
+
+    if (!guards || guards.length === 0) {
+      return res.status(404).json({
+        message: "No guards found for this vendor",
+      });
+    }
+
+    res.status(200).json({
+      message: "Guards found for this vendor",
+      data: guards,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to fetch guards for this vendor",
+    });
+  }
+};
+
   module.exports = {
     addGuard,
     signin,
     getGuard,
-    updateGuard  
+    updateGuard ,
+    getAllGuardsByVendorId 
   };
   

@@ -29,6 +29,7 @@ const guardSchema = new Schema({
   contact: {
     type: Number,
   },
+  vendor:String,
   image: String,
   active: {
     type: Boolean,
