@@ -10,6 +10,9 @@ const router = require("express").Router();
 
 
   router.route('/create-new-booking').post(bookingController.create_new_booking);
+  router.route('/booking-status/:bookingId').put(bookingController.booking_status);
+
+
   router.route('/incoming-booking-status').put(decodeToken, bookingController.Incoming_booking_status);
   // router.route('/create-new-booking').post(decodeToken,bookingController.create_new_booking);
 
