@@ -5,6 +5,7 @@ exports.viewBookingList = async (req, res) => {
   try {
     const user = req.userID
     const bookings = await Booking.find();
+    
     res.status(200).json({
       success: true,
       data: bookings

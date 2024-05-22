@@ -7,10 +7,10 @@ const bookingSchema = new mongoose.Schema({
     type: String 
   },
   inTime: {
-    type: Date,
+    type: String,
   },
   outTime: {
-    type: Date,
+    type: String,
   },
   actualInTime:String,
   actualOutTime:String,
