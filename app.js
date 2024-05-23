@@ -67,11 +67,11 @@ app.use("/posts", postRoutes);
 app.use("/communities", communityRoutes);
 app.use("/admin", adminRoutes);
 app.use("/vehicle", vehcileRoutes);
-app.use("/api/parking", parkingRoutes)
-app.use("/api/booking", bookingRoutes)
-app.use("/api/vendor", vendorRoute)
+app.use("/v1/api/parking", parkingRoutes)
+app.use("/v1/api/booking", bookingRoutes)
+app.use("/v1/api/vendor", vendorRoute)
 app.use("/booking", paymentRoute)
-app.use("/api/guard", guardRoutes)
+app.use("/v1/api/guard", guardRoutes)
 
 
 

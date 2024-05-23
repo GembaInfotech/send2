@@ -6,7 +6,8 @@ const {updateParking} = require('../handlers/parkingHandler/updateParking')
 const {getParkingByParkingId} = require('../handlers/parkingHandler/getParkingByParkingId')
 const {getParkingByGuardId} = require('../handlers/parkingHandler/getParkingByGuardId')
 // const getParkingByParkingId 
-
+const {approve}  = require('../handlers/parkingHandler/approve')
+const { pending} = require('../handlers/parkingHandler/pendingHandler')
 
 exports.view_Parking_list = async (req, res) => {
   try {
@@ -16,6 +17,13 @@ exports.view_Parking_list = async (req, res) => {
   }
 };
 
+exports.approve = async (req, res) => {
+  try {
+    await approve(req, res);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 exports.get_parking_by_parkingId = async (req, res) => {
   try {
 
@@ -25,6 +33,16 @@ exports.get_parking_by_parkingId = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+exports.pending = async(req,res) =>{
+  try{
+    await pending(req,res);
+  }
+  catch(err)
+  {
+    res.status(500).json(err)
+  }
+}
 
 
 exports.get_parking_by_guardId = async (req, res) => {
