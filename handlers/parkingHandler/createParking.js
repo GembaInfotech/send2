@@ -2,8 +2,7 @@ const ParkingModel = require("../../models/parking.model")
 
 exports.createParking = async (req, res) => {
     try {
-      // console.log("testing....1");
-      // console.log(req.userId);
+      
       console.log(req.body.ParkingData);
       let parkingData = req.body.ParkingData;
       parkingData["vendor_id"] = req.userId;
@@ -11,12 +10,10 @@ exports.createParking = async (req, res) => {
 
       console.log(req.userId);
       console.log();
-      // console.log(parkingData);
       const newParking = new ParkingModel(parkingData);
-      // console.log("newParking", newParking);
+      
      try{
       const savedParking = await newParking.save();
-      // console.log("savedParking", savedParking);
      }
      catch(Err)
      {
