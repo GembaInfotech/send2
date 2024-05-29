@@ -175,6 +175,7 @@ const getVendor = async (req, res, next) => {
 const addVendor = async (req, res, next) => {
   try {
     const vendorData = { ...req.body };
+    console.log(req.body)
     console.log(vendorData);
     const existingVendor = await vendorModel.findOne({ email: vendorData.email });
     console.log("extist", existingVendor);
