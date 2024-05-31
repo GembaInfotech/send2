@@ -219,6 +219,21 @@ const updateVendor = async (req, res, next) => {
   }
 };
 
+const updateVendorById = async (req, res, next) => {
+  try {
+    const vednorId = req.params
+    const updateData = req.body.data;
+
+    const updatedVendor = await vendorModel.findByIdAndUpdate(vednorId, updateData, { new: true }).select("-password").lean();
+    if (!updatedVendor) {
+      return res.status(404).json({ message: "Vendor not found" });
+    }
+    res.status(200).json(updatedVendor);
+  } catch (err) {
+    next(err);
+  }
+};
+
 const updateVendorStatus = async (req, res, next) => {
   try {
     const id = req.userId;
@@ -309,5 +324,6 @@ module.exports = {
   updateVendor,
   updateVendorStatus,
   getAllVendor,
+  updateVendorById,
   refreshToken
 };
