@@ -19,7 +19,7 @@ exports.bookingStatus = async (req, res) => {
 
                 booking.status = status;
  const value = format(new Date(), "yyyy-MM-dd'T'hh:mm");
-                booking.actualInTime ="2024-05-21T13:51"
+                booking.actualInTime =value
                 booking.status = status;
                 await booking.save();
                 res
@@ -45,7 +45,7 @@ exports.bookingStatus = async (req, res) => {
                 console.log("here")
 
                 const value = format(new Date(), "yyyy-MM-dd'T'hh:mm");
-                booking.actualOutTime = "2024-05-21T17:23";
+                booking.actualOutTime = value
 
                 booking.duration = differenceInMinutes(booking.outTime ,booking.inTime);
                 booking.actualDuration = differenceInMinutes(booking.actualOutTime ,booking.actualInTime);

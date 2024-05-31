@@ -192,6 +192,7 @@ const signin = async (req, res, next) => {
 const addGuard = async (req, res, next) => {
   try {
       const guardData = { ...req.body };
+      console.log(req.body);
       const vendor = req.userId
       console.log(guardData);
 
