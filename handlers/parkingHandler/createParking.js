@@ -1,19 +1,24 @@
-const ParkingModel = require("../../models/parking.model")
+const ParkingModel = require("../../models/parking.model");
+const { generateParkingCode } = require("../codeHandler/Codes");
 
 exports.createParking = async (req, res) => {
     try {
-      
-      console.log(req.body.ParkingData);
+       
+    
       let parkingData = req.body.ParkingData;
       parkingData["vendor_id"] = req.userId;
       parkingData.vendorId = req.userId;
 
-      console.log(req.userId);
-      console.log();
+    
       const newParking = new ParkingModel(parkingData);
+     
       
      try{
       const savedParking = await newParking.save();
+      const code = await generateParkingCode();
+      savedParking.code = code;
+await savedParking.save();
+
      }
      catch(Err)
      {

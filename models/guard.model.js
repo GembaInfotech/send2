@@ -5,6 +5,9 @@ const crypto = require("crypto");
 const { Schema } = mongoose;
 
 const guardSchema = new Schema({
+  code:{
+   type:String
+  },
   name: {
     type: String,
     required: true,

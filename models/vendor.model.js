@@ -6,6 +6,11 @@ const jwt = require('jsonwebtoken');
 
 const VendorSchema = new Schema(
   {
+    code: {
+      type: String,
+      required: false,
+      
+    },
     firstName: {
       type: String,
       required: false,

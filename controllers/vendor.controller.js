@@ -6,6 +6,7 @@ const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const duration = require("dayjs/plugin/duration");
 const dayjs = require("dayjs");
 const { findOne } = require('../models/parking.model');
+const { generatevendorCode } = require('../handlers/codeHandler/Codes');
 dayjs.extend(duration);
 
 const LOG_TYPE = {
@@ -173,7 +174,10 @@ const getVendor = async (req, res, next) => {
 };
 
 const addVendor = async (req, res, next) => {
+
   try {
+
+  
     const vendorData = { ...req.body };
     console.log(req.body)
     console.log(vendorData);
@@ -187,7 +191,10 @@ const addVendor = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(vendorData.password, 10);
     console.log("testing..1.23");
+    const code = await generatevendorCode();
+    console.log(code);
     const newVendor = new vendorModel({
+      code: code,
       ...vendorData,
       password: hashedPassword,
     });

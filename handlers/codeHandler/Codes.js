@@ -1,0 +1,41 @@
+const Code = require('../../models/code')
+
+exports.generatevendorCode  = async()=>{
+    const code  = await Code.findOneAndUpdate(
+        {},  // Empty filter to match any document
+        { $inc: { vendor: 1 } },  // Increment the currentCode by 1
+        { new: true}    // Create the document if it doesn't exist
+      ).select('vendor');
+    
+      // Format the code and assign it to the booking
+      
+      const codeNumber = code.vendor;
+     const  vendorCode = `V${String(codeNumber).padStart(9, '0')}`;
+return vendorCode;
+}
+exports.generateGaurdCode  = async()=>{
+    const code  = await Code.findOneAndUpdate(
+        {},  // Empty filter to match any document
+        { $inc: { gaurd: 1 } },  // Increment the currentCode by 1
+        { new: true}    // Create the document if it doesn't exist
+      ).select('gaurd');
+    
+      // Format the code and assign it to the booking
+      
+      const codeNumber = code.gaurd;
+     const  gaurdCode = `G${String(codeNumber).padStart(9, '0')}`;
+return gaurdCode;
+}
+exports.generateParkingCode  = async()=>{
+    const code  = await Code.findOneAndUpdate(
+        {},  // Empty filter to match any document
+        { $inc: { parking: 1 } },  // Increment the currentCode by 1
+        { new: true}    // Create the document if it doesn't exist
+      ).select('parking');
+    
+      // Format the code and assign it to the booking
+      
+      const codeNumber = code.parking;
+     const  parkingCode = `P${String(codeNumber).padStart(9, '0')}`;
+return parkingCode;
+}

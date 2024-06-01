@@ -9,6 +9,7 @@ const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const duration = require("dayjs/plugin/duration");
 const dayjs = require("dayjs");
 const { findOne } = require('../models/parking.model');
+const { generateGaurdCode } = require('../handlers/codeHandler/Codes');
 dayjs.extend(duration);
 
 
@@ -216,6 +217,8 @@ const addGuard = async (req, res, next) => {
           vendor:req.userId
            // Assuming parking ID is passed as a parameter
       });
+      const code  = await generateGaurdCode();
+      newGuard.code=code;
 
       console.log("New Guard: ", newGuard);
       await newGuard.save();

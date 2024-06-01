@@ -4,6 +4,11 @@ const Schema = mongoose.Schema;
 
 const ParkingSchema = new Schema(
   {
+    code:{
+      type:String,
+      
+
+    },
     name: {
       type: String,
       required: false,
