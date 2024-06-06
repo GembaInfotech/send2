@@ -9,7 +9,6 @@ const VendorSchema = new Schema(
     code: {
       type: String,
       required: false,
-      
     },
     firstName: {
       type: String,
@@ -29,6 +28,15 @@ const VendorSchema = new Schema(
       required: true,
       lowercase: true
     },
+    panNo: {
+      type: String,
+    },
+    gstNo: {
+      type: String,
+    },
+    companyRegNo: {
+      type: String,
+    },
     password: {
       type: String,
       required: true,
@@ -42,114 +50,99 @@ const VendorSchema = new Schema(
     },
     acceptedTerms: {
       type: Boolean,
+      default: false
     },
     vendorStatus: {
       type: String,
-      enum: ['Pending','Verified', 'Active', 'InActive'],
+      enum: ['Pending', 'Verified', 'Active', 'InActive'],
       default: 'Pending'
     },
     vendorActive: {
       type: Boolean,
+      default: false
     },
     token: {
       type: String,
       required: false,
     },
-    pincode: {
-      type: Number,
-      required: false,
-    },
-    address: {
-      type: String,
-      required: false,
-    },
-
-    billingAddress:{
-      address:{
-        trype:String
+    billingAddress: {
+      address: {
+        type: String
       },
-      postalCode:{
-        type:String
+      postalCode: {
+        type: String
       },
-      city:{
-        type:String
+      city: {
+        type: String
       },
-      state:{
-        type:String
+      state: {
+        type: String
       },
-      contact:{
-        type:String
+      contact: {
+        type: String
       },
-      email:{
-        type:String
+      email: {
+        type: String
       },
-      country:{
-        type:String
+      country: {
+        type: String
       }
     },
-    communicationAddress:{
-      address:{
-        trype:String
+    communicationAddress: {
+      address: {
+        type: String
       },
-      postalCode:{
-        type:String
+      postalCode: {
+        type: String
       },
-      city:{
-        type:String
+      city: {
+        type: String
       },
-      state:{
-        type:String
+      state: {
+        type: String
       },
-      contact:{
-        type:String
+      contact: {
+        type: String
       },
-      email:{
-        type:String
+      email: {
+        type: String
       },
-      country:{
-        type:String
+      country: {
+        type: String
       }
     },
-    city: {
-      type: String,
-      required: false,
-    },
-    state: {
-      type: String,
-      required: false,
-    },
-    country: {
-      type: String,
-      required: false,
-    },
+    
     role: {
       type: String,
       enum: ['Vendor'],
       default: 'Vendor'
     },
-    type:{
-      type:String,
-      enum:[ "Indiviuals", "propWriter", "M/S"]
+    title: {
+      type: String,
+      enum: ["Individuals", "propWriter", "M/S"]
     },
-    account:{
-      accountHolder:{
-        type:String,
+    account: {
+      accountHolder: {
+        type: String,
       },
-      accountNumber:{
-        type:String,
+      accountNumber: {
+        type: String,
       },
-      bankName:{
-        type:String,
+      bankName: {
+        type: String,
       },
-      branchName:{
-        type:String,
+      branchName: {
+        type: String,
       },
-      ifscCode:{
-        type:String,
+      ifscCode: {
+        type: String,
       },
-      BranchEmail:{
-        type:String,
+      BranchEmail: {
+        type: String,
       }
+    },
+    createdBy: {
+      type: String
     },
     tokens: [{
       reftoken: {
@@ -163,37 +156,39 @@ const VendorSchema = new Schema(
   { timestamps: true }
 );
 
-VendorSchema.methods.generateRefreshToken = async function(){
-  try{
+VendorSchema.methods.generateRefreshToken = async function() {
+  try {
     let reftoken = jwt.sign(
       { username: this.uniqueId },
       process.env.JWT_SECRET,
       {
         // TODO: SET JWT TOKEN DURATION HERE
-        expiresIn:  '1h',
+        expiresIn: '1h',
       }
     );
-    let timeStamp = format(new Date(), 'Pp');
-    this.tokens = this.tokens.concat({reftoken, timeStamp});
+    let timeStamp = new Date().toISOString();
+    this.tokens = this.tokens.concat({ reftoken, timeStamp });
     await this.save();
     return reftoken;
-  } catch(err){
+  } catch (err) {
     console.log("Error")
   }
 }
-VendorSchema.methods.generateAuthToken = async function(){
-  try{
+
+VendorSchema.methods.generateAuthToken = async function() {
+  try {
     let token = jwt.sign(
       { username: this.uniqueId },
       process.env.JWT_SECRET,
       {
         // TODO: SET JWT TOKEN DURATION HERE
-        expiresIn:  '10m',
+        expiresIn: '10m',
       }
     );
     return token;
-  } catch(err){
+  } catch (err) {
     console.log("Error")
   }
 }
+
 module.exports = mongoose.model('VendorModel', VendorSchema);
