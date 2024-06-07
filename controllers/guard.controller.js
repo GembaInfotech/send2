@@ -266,6 +266,45 @@ const getGuard = async (req, res, next) => {
     }
 };
 
+const getGuardsByParkingId = async (req, res, next) => {
+  try {
+    console.log("dhsjkfjk");
+      const parkingId = req.params.parkingId; // Assuming the parking id is passed as req.params.id
+      console.log(parkingId);
+
+      // Find the parking document by id
+      const parking = await ParkingModel.findById(parkingId);
+
+      if (!parking) {
+          return res.status(404).json({
+              message: "Parking not found",
+          });
+      }
+
+      // Extract the guard IDs from the parking document
+      const guardIds = parking.guard_id;
+
+      // Find all guards whose IDs are in the guardIds array
+      const guards = await GuardModel.find({ _id: { $in: guardIds } });
+
+      if (!guards) {
+          return res.status(404).json({
+              message: "Guards not found",
+          });
+      }
+
+      res.status(200).json({
+          data: guards,
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({
+          message: "Failed to get guards",
+      });
+  }
+};
+
+
 const updateGuard = async (req, res, next) => {
     try {
       // const vendor = req.userId;
@@ -326,6 +365,7 @@ const getAllGuardsByVendorId = async (req, res, next) => {
     addGuard,
     signin,
     getGuard,
+    getGuardsByParkingId,
     updateGuard ,
     getAllGuardsByVendorId 
   };
