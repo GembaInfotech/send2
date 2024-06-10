@@ -30,6 +30,12 @@ const bookingSchema = new mongoose.Schema({
   totalPrice: Number,
   bookingPrice:Number,
   paymentId:String,
+  checkinBy:String,
+  parkedAt:{
+    spaceName:String,
+    spaceId:String
+  },
+  checkoutBy:String,
   status: {
     type: String,
     enum: ["Pending","Incoming", "Parked", "Completed"],

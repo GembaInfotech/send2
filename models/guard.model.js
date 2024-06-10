@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const { type } = require("os");
 
 const { Schema } = mongoose;
 
@@ -31,6 +32,18 @@ const guardSchema = new Schema({
   },
   contact: {
     type: Number,
+  },
+  shift:{
+    startTime:{
+      type:Date
+    },
+    endTime: {
+      type:Date
+    },
+    shiftType:{
+      type:String,
+      enum:["Morning", "Evening", "Night"]
+    }
   },
   vendor:String,
   image: String,

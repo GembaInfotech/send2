@@ -6,8 +6,6 @@ const ParkingSchema = new Schema(
   {
     code:{
       type:String,
-      
-
     },
     name: {
       type: String,
@@ -54,6 +52,21 @@ const ParkingSchema = new Schema(
         required: false,
         uppercase:true
 
+      },
+      twoWheelerCapacity: {
+        type: Number,
+        required: false,
+        // min:10
+      },
+      fourWheelerCapacity: {
+        type: Number,
+        required: false,
+        // min:10
+      },
+      totalCapacity: {
+        type: Number,
+        required: false,
+        // min:20
       },
       capacity: {
         type: Number,

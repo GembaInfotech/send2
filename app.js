@@ -24,6 +24,7 @@ const bookingRoutes = require("./routes/booking.route.js")
 const vendorRoute = require('./routes/vendor.route.js')
 const paymentRoute = require('./routes/paymentRoute.js')
 const guardRoutes = require('./routes/guard.route.js')
+const parkingSpaceroute = require('./routes/parkingSpace.route.js')
 
 const app = express();
 
@@ -68,6 +69,8 @@ app.use("/communities", communityRoutes);
 app.use("/admin", adminRoutes);
 app.use("/vehicle", vehcileRoutes);
 app.use("/v1/api/parking", parkingRoutes)
+app.use("/v1/api/parkingSpace", parkingSpaceroute)
+
 app.use("/v1/api/booking", bookingRoutes)
 app.use("/v1/api/vendor", vendorRoute)
 app.use("/booking", paymentRoute)
