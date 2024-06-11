@@ -3,7 +3,8 @@ const BookingModel = require('../../models/booking.model');
 const { format } = require('date-fns')
 const { differenceInMinutes } = require('date-fns/differenceInMinutes');
 const ParkingModel = require('../../models/parking.model');
-const parkingSpace = require('../../models/parkingSpace.model')
+const parkingSpace = require('../../models/parkingSpace.model');
+const GuardModel = require('../../models/guard.model')
 
 
 exports.bookingStatus = async (req, res) => {
@@ -21,6 +22,7 @@ exports.bookingStatus = async (req, res) => {
       .json({ error: "Booking status is already completed" });
     if (status == "Parked") {
       try {
+        const Guard = await GuardModel.findById(guardid)
         const ParkingSpace = await parkingSpace.findById(spaceId);
         if (!ParkingSpace) return res.status(404).json({ error: "Parking Space not found" });
         if (ParkingSpace.isOccupied) {
@@ -34,7 +36,8 @@ exports.bookingStatus = async (req, res) => {
 
         }
 
-        booking.checkinBy = guardid
+        booking.checkinBy.guardId = Guard.code
+        booking.checkinBy.guardName = Guard.name
         booking.parkedAt.spaceName = parkedAt
         booking.parkedAt.spaceId = spaceId
         booking.status = status;
@@ -52,6 +55,8 @@ exports.bookingStatus = async (req, res) => {
     }
     else if (status === "Completed") {
       try {
+        const Guard = await GuardModel.findById(guardid)
+
         const ParkingSpace = await parkingSpace.findById(spaceId);
         if (ParkingSpace.isOccupied) {
           ParkingSpace.isOccupied = false;
@@ -64,7 +69,9 @@ exports.bookingStatus = async (req, res) => {
         const id = booking.parking
         const Parking = await ParkingModel.findById(id);
 
-        booking.checkoutBy = guardid
+        booking.checkoutBy.guardId = Guard.code
+        booking.checkoutBy.guardName = Guard.name
+
 
         booking.status = status;
         console.log("here")
