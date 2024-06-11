@@ -6,15 +6,12 @@ const ParkingModel = require('../../models/parking.model');
 const parkingSpace = require('../../models/parkingSpace.model');
 const GuardModel = require('../../models/guard.model')
 
-
 exports.bookingStatus = async (req, res) => {
   const { status, tp, parkedAt, guardid, spaceId } = req.body;
   console.log(req.body);
 
   try {
     const { bookingId } = req.params;
-
-
     const booking = await BookingModel.findById(bookingId);
     if (!booking) return res.status(404).json({ error: "Booking not found" });
     if (booking.status === status) return res
