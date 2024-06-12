@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Database = require("../config/database");
 const bookingSchema = new mongoose.Schema({
   user: {
     type: String
