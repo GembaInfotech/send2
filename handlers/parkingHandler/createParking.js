@@ -7,9 +7,10 @@ exports.createParking = async (req, res) => {
 
 
     // let parkingData = req.body.ParkingData;
-    let parkingData = req.body;
-    let twoWheelerCapacity = req.body.twoWheelerCapacity
-    let fourWheelerCapacity = req.body.fourWheelerCapacity
+    let parkingData = req.body.ParkingData;
+    console.log(req.body.ParkingData);
+    let twoWheelerCapacity = req.body.ParkingData.twoWheelerCapacity
+    let fourWheelerCapacity = req.body.ParkingData.fourWheelerCapacity
     console.log(twoWheelerCapacity, fourWheelerCapacity);
 
     parkingData["vendor_id"] = req.userId;
