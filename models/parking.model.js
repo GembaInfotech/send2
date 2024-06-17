@@ -68,6 +68,9 @@ const ParkingSchema = new Schema(
       required: false,
       // min:20
     },
+    gst:{
+      type:String
+    },
     registeration_no: {
       type: String,
       required: false,

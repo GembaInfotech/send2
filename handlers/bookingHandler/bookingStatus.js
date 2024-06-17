@@ -4,7 +4,8 @@ const { format } = require('date-fns')
 const { differenceInMinutes } = require('date-fns/differenceInMinutes');
 const ParkingModel = require('../../models/parking.model');
 const parkingSpace = require('../../models/parkingSpace.model');
-const GuardModel = require('../../models/guard.model')
+const GuardModel = require('../../models/guard.model');
+const { logging } = require('googleapis/build/src/apis/logging');
 
 exports.bookingStatus = async (req, res) => {
   const { status, tp, parkedAt, guardid, spaceId } = req.body;
@@ -74,13 +75,21 @@ exports.bookingStatus = async (req, res) => {
         console.log("here")
 
         const value = format(new Date(), "yyyy-MM-dd'T'HH:MM");
-        booking.actualOutTime = value
+        const outDate = value.split("T")[0]
+        const validityDate = Parking.validity_ToDate
+        console.log(outDate);
+        console.log(validityDate);
+        if(outDate > validityDate) {
+          console.log("validity date expire");
+        }
+        booking.actualOutTime = value;
 
         booking.duration = differenceInMinutes(booking.outTime, booking.inTime);
         booking.actualDuration = differenceInMinutes(booking.actualOutTime, booking.actualInTime);
 
         const unit = booking.actualDuration - booking.duration;
-        if (unit > 0) {
+
+        if (unit > 0 && outDate <= validityDate) {
           booking.exceedPrice = Parking?.exceed_price * (unit / Parking.exceed_price_for)
 
           booking.exceedCGST = Math.ceil(booking.exceedPrice * 0.09);
