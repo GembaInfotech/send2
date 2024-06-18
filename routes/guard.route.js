@@ -6,6 +6,7 @@ const decodeToken = require("../middlewares/auth/decodeToken");
 
 router.route('/create-new-guard/:parkingid').post(decodeToken,guardController.addGuard);
 router.route('/guard-login').post( guardController.signin);
+router.route('/logout').delete( guardController.logout);
 router.route('/get-guard/:guardId').get( guardController.getGuard);
 router.route('/get-guards/:parkingId').get( guardController.getGuardsByParkingId);
 router.route('/update-guard/:guardId').put( guardController.updateGuard);

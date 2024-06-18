@@ -15,7 +15,7 @@ router.route('/get-all-vendor').get(vendorController.getAllVendor);
 router.route('/update-vendor').put(decodeToken,vendorController.updateVendor);
 router.route('/update-vendor/:vednorId').put(decodeToken,vendorController.updateVendorById);
 router.route('/update-vendor-status').put(decodeToken,vendorController.updateVendorStatus);
-router.post("/logout", vendorController.logout);
+router.delete("/logout", decodeToken,  vendorController.logout);
 router.post("/refresh-token", vendorController.refreshToken);
 
 

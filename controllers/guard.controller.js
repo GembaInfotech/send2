@@ -145,6 +145,33 @@ const signin = async (req, res, next) => {
       });
     }
   };
+
+  const logout = async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      // console.log(authHeader);
+      console.log(authHeader);
+      const accessToken = authHeader.split(" ")[1];
+      if (accessToken) {
+        await guardToken.deleteOne({ accessToken });
+        await saveLogInfo(
+          null,
+          MESSAGE.LOGOUT_SUCCESS,
+          LOG_TYPE.LOGOUT,
+          LEVEL.INFO
+        );
+      }
+     
+      res.status(200).json({
+        message: "Guard Logout successful",
+      });
+    } catch (err) {
+      await saveLogInfo(null, err.message, LOG_TYPE.LOGOUT, LEVEL.ERROR);
+      res.status(500).json({
+        message: "Internal server error. Please try again later.",
+      });
+    }
+  };
   
 //   const addGuard = async (req, res, next) => {
 //     try {
@@ -364,6 +391,7 @@ const getAllGuardsByVendorId = async (req, res, next) => {
   module.exports = {
     addGuard,
     signin,
+    logout,
     getGuard,
     getGuardsByParkingId,
     updateGuard ,

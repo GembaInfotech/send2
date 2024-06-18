@@ -140,10 +140,9 @@ const signin = async (req, res, next) => {
 
 const logout = async (req, res) => {
   try {
-    const refreshToken = req.headers.authorization?.split(" ")[1] ?? null;
-    console.log(req.headers.authorization)
-    if (refreshToken) {
-      await vendorToken.deleteOne({ refreshToken });
+      const vendor = req.userId
+    if (vendor) {
+      await vendorToken.deleteOne({ vendor });
       await saveLogInfo(
         null,
         MESSAGE.LOGOUT_SUCCESS,
