@@ -15,7 +15,7 @@ exports.getBookingsByQuery = async (req, res, next) => {
         }
 
         // Fetch bookings based on query
-        const bookings = await BookingModel.find(query);
+        const bookings = await BookingModel.find(query).sort({inTime:-1});
 
         res.status(200).json({ bookings });
     } catch (error) {
