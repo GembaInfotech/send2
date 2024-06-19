@@ -104,6 +104,7 @@ const ParkingSchema = new Schema(
       max: 200,
       required: false,
     },
+    
     location: {
       type: {
         type: String, // Don't do `{ location: { type: String } }`

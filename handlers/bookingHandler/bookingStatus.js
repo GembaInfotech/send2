@@ -9,7 +9,6 @@ const { logging } = require('googleapis/build/src/apis/logging');
 
 exports.bookingStatus = async (req, res) => {
   const { status, tp, parkedAt, guardid, spaceId } = req.body;
-  console.log(req.body);
 
   try {
     const { bookingId } = req.params;
@@ -39,8 +38,9 @@ exports.bookingStatus = async (req, res) => {
         booking.parkedAt.spaceName = parkedAt
         booking.parkedAt.spaceId = spaceId
         booking.status = status;
-        const value = format(new Date(), "yyyy-MM-dd'T'HH:MM");
-        booking.actualInTime = value
+        const value = format(new Date(), "yyyy-MM-dd'T'HH:mm");
+        console.log(value);
+        booking.actualInTime = format(new Date(), "yyyy-MM-dd'T'HH:mm");
         booking.status = status;
         await booking.save();
         res
@@ -62,8 +62,6 @@ exports.bookingStatus = async (req, res) => {
           res
             .status(206)
         }
-        console.log("here")
-        console.log(booking.parking)
         const id = booking.parking
         const Parking = await ParkingModel.findById(id);
 
@@ -72,17 +70,16 @@ exports.bookingStatus = async (req, res) => {
 
 
         booking.status = status;
-        console.log("here")
 
-        const value = format(new Date(), "yyyy-MM-dd'T'HH:MM");
+        const value = format(new Date(), "yyyy-MM-dd'T'HH:mm");
         const outDate = value.split("T")[0]
         const validityDate = Parking.validity_ToDate
-        console.log(outDate);
-        console.log(validityDate);
         if(outDate > validityDate) {
           console.log("validity date expire");
         }
-        booking.actualOutTime = value;
+        console.log(value, "hekker");
+       console.log(new Date());
+        booking.actualOutTime = format(new Date(), "yyyy-MM-dd'T'HH:mm");
 
         booking.duration = differenceInMinutes(booking.outTime, booking.inTime);
         booking.actualDuration = differenceInMinutes(booking.actualOutTime, booking.actualInTime);
