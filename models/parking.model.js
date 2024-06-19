@@ -92,13 +92,25 @@ const ParkingSchema = new Schema(
       type: Boolean,
       default: false
     },
-    price: {
+    priceF: {
       type: Number,
       min: 20,
       max: 1000,
       required: false,
     },
-    exceed_price: {
+    priceT: {
+      type: Number,
+      min: 20,
+      max: 1000,
+      required: false,
+    },
+    exceed_priceF: {
+      type: Number,
+      min: 5,
+      max: 200,
+      required: false,
+    },
+    exceed_priceT: {
       type: Number,
       min: 5,
       max: 200,
