@@ -84,10 +84,11 @@ exports.bookingStatus = async (req, res) => {
         booking.duration = differenceInMinutes(booking.outTime, booking.inTime);
         booking.actualDuration = differenceInMinutes(booking.actualOutTime, booking.actualInTime);
 
-        const unit = booking.actualDuration - booking.duration;
+        const unit = booking.actualDuration - booking.duration- 8;
 
         if (unit > 0 && outDate <= validityDate) {
-          booking.exceedPrice = Parking?.exceed_price * (unit / Parking.exceed_price_for)
+          const exceedPrice = booking.vehicle_type== "two wheeler"?  Parking.exceed_priceT : Parking.exceed_priceF;
+          booking.exceedPrice = exceedPrice * (unit / Parking.exceed_price_for)
 
           booking.exceedCGST = Math.ceil(booking.exceedPrice * 0.09);
           booking.exceedSGST = Math.ceil(booking.exceedPrice * 0.09);
