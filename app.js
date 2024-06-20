@@ -55,6 +55,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(passport.initialize());
 require("./config/passport.js");
+require("./cronJobs/updateParkingStatus.js")
 
 app.get("/server-status", (req, res) => {
   res.status(200).json({ message: "Server is up and running!" });
