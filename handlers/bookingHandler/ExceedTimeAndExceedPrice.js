@@ -20,7 +20,7 @@ exports.exceedTimeAndExceedprice = async (req, res) => {
         booking.actualOutTime = format(new Date(), "yyyy-MM-dd'T'HH:mm");
         booking.duration = differenceInMinutes(booking.outTime, booking.inTime);
         booking.actualDuration = differenceInMinutes(booking.actualOutTime, booking.actualInTime);
-        const unit = booking.actualDuration - booking.duration;
+        const unit = booking.actualDuration - booking.duration-8;
         // console.log(unit);
 
         if (unit > 0) {
