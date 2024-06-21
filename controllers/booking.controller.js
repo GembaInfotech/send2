@@ -5,6 +5,7 @@ const {incomingBookingStatus} = require('../handlers/bookingHandler/incomingBook
 const {getBookingsByQuery} = require('../handlers/bookingHandler/getBookingsByQuery')
 const {getIncomingBokingIn15Min} = require('../handlers/bookingHandler/getIncomingBokingIn15Min')
 const {bookingStatus}  = require('../handlers/bookingHandler/bookingStatus')
+const {exceedTimeAndExceedprice} = require('../handlers/bookingHandler/ExceedTimeAndExceedPrice')
 
 exports.view_booking_list = async (req, res) => {
   try {
@@ -58,6 +59,18 @@ exports.Incoming_booking_status= async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   };
+
+  exports.exceed_time_and_exceed_price = async (req, res) => {
+    try {
+      console.log("testing------34");
+      await exceedTimeAndExceedprice(req, res);
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+
+  
   
 
 

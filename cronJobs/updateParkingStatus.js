@@ -27,4 +27,4 @@ const updateParkingStatus = async () => {
   cron.schedule('0 0 * * *', updateParkingStatus);
   
   // Run a check immediately upon starting the server
-  updateParkingStatus();
+  // updateParkingStatus();

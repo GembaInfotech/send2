@@ -31,6 +31,9 @@ const bookingSchema = new mongoose.Schema({
   totalPrice: Number,
   bookingPrice:Number,
   paymentId:String,
+  vehicle_name:String,
+      vehicle_number:String,
+      vehicle_type:String,
   
   parkedAt:{
     spaceName:String,

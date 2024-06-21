@@ -12,6 +12,10 @@ const router = require("express").Router();
 
 
   router.route('/create-new-booking').post(bookingController.create_new_booking);
+
+  
+  router.route('/exceed-time-and-exceed-price/:bookingId').put(bookingController.exceed_time_and_exceed_price);
+
   router.route('/booking-status/:bookingId').put(bookingController.booking_status);
 
 
