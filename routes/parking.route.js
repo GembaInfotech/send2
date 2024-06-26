@@ -1,6 +1,7 @@
 'use strict';
 const router = require("express").Router();
 const passport = require("passport");
+const { uploadPhoto, parkingImgResize } = require("../middlewares/ImageUpload/upload");
 
 const decodeToken = require("../middlewares/auth/decodeToken");
 
@@ -16,6 +17,7 @@ const decodeToken = require("../middlewares/auth/decodeToken");
   router.route('/getguardParking/:guard_id').get(parkingController.get_parking_by_guardId);
   router.route('/pending').get( parkingController.pending);
   router.route('/approve/:id').put( parkingController.approve);
+  router.route('/add-new-image/:id').post(         uploadPhoto.single('file'), parkingImgResize, parkingController.upload);
 
 
 

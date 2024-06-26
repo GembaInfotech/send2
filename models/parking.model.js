@@ -161,9 +161,9 @@ const ParkingSchema = new Schema(
       required: true,
     },
 
-    image: {
+    image: [{
       type: String
-    },
+    }],
     regiseration_doc_image: {
       type: String
     },
