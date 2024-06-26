@@ -322,6 +322,94 @@ const refreshToken = async (req, res) => {
   }
 };
 
+const panUpload = async (req, res) => {
+  try {
+      // console.log(req.body, req.params, req.userId);
+      const {id} = req.body;
+      console.log(id);
+    // Check if the vendor ID is valid
+    const isValidVendor = await vendorModel.exists({ _id: id });
+    console.log(isValidVendor);
+    if (!isValidVendor) {
+      return res.status(404).json({ success: false, message: 'Vendor not found for the given vendor ID' });
+    }
+
+    // Update the parking
+    const updatedVendor = await vendorModel.findByIdAndUpdate(id, 
+      { $push: { panImage : req?.imagepath.url } }
+
+      , { new: true });
+    console.log(updatedVendor);
+
+    if (!updatedVendor) {
+      return res.status(404).json({ success: false, message: 'Vendor not found' });
+    }
+
+    res.status(200).json({ success: true, message: 'Vendor updated successfully', vendor: updatedVendor });
+  } catch (error) {
+      console.log(error)
+    res.status(500).json({ success: false, message: 'Error updating vendor', error: error.message });
+  }
+};
+
+const adhaarUpload = async (req, res) => {
+  try {
+      // console.log(req.body, req.params, req.userId);
+      const {id} = req.body;
+      console.log(id);
+    // Check if the vendor ID is valid
+    const isValidVendor = await vendorModel.exists({ _id: id });
+    console.log(isValidVendor);
+    if (!isValidVendor) {
+      return res.status(404).json({ success: false, message: 'Vendor not found for the given vendor ID' });
+    }
+
+    // Update the parking
+    const updatedVendor = await vendorModel.findByIdAndUpdate(id, 
+      { $push: { adhaarImage : req?.imagepath.url } }
+
+      , { new: true });
+    console.log(updatedVendor);
+
+    if (!updatedVendor) {
+      return res.status(404).json({ success: false, message: 'Vendor not found' });
+    }
+
+    res.status(200).json({ success: true, message: 'Vendor updated successfully', vendor: updatedVendor });
+  } catch (error) {
+      console.log(error)
+    res.status(500).json({ success: false, message: 'Error updating vendor', error: error.message });
+  }
+};
+const profileUpload = async (req, res) => {
+  try {
+      // console.log(req.body, req.params, req.userId);
+      const {id} = req.body;
+      console.log(id);
+    // Check if the vendor ID is valid
+    const isValidVendor = await vendorModel.exists({ _id: id });
+    console.log(isValidVendor);
+    if (!isValidVendor) {
+      return res.status(404).json({ success: false, message: 'Vendor not found for the given vendor ID' });
+    }
+
+    // Update the parking
+    const updatedVendor = await vendorModel.findByIdAndUpdate(id, 
+      { $push: { profileImage : req?.imagepath.url } }
+
+      , { new: true });
+    console.log(updatedVendor);
+
+    if (!updatedVendor) {
+      return res.status(404).json({ success: false, message: 'Vendor not found' });
+    }
+
+    res.status(200).json({ success: true, message: 'Vendor updated successfully', vendor: updatedVendor });
+  } catch (error) {
+      console.log(error)
+    res.status(500).json({ success: false, message: 'Error updating vendor', error: error.message });
+  }
+};
 module.exports = {
   addVendor,
   signin,
@@ -331,5 +419,8 @@ module.exports = {
   updateVendorStatus,
   getAllVendor,
   updateVendorById,
-  refreshToken
+  refreshToken,
+  panUpload,
+  adhaarUpload,
+  profileUpload
 };

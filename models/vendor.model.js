@@ -61,6 +61,20 @@ const VendorSchema = new Schema(
       type: Boolean,
       default: false
     },
+
+    panImage: [{
+      type: String
+    }],
+    gstImage: [{
+      type: String
+    }],
+    adhaarImage: [{
+      type: String
+    }],
+    profileImage: [{
+      type: String
+    }],
+
     token: {
       type: String,
       required: false,
