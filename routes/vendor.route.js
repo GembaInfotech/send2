@@ -12,7 +12,10 @@ router.route('/create-new-vendor').post(vendorController.addVendor);
 // router.route('/delete-vendor/:vendorId').delete( vendorController.delete_vendor);
 router.route('/vendor-login').post( vendorController.signin);
 router.route('/get-vendor').get(decodeToken,vendorController.getVendor);
-router.route('/get-all-vendor').get(vendorController.getAllVendor);
+router.route('/get-all-vendor/:gteId').get(vendorController.getAllVendor);
+router.route('/get-all-vendors').get(vendorController.getVendors);
+
+
 
 router.route('/update-vendor').put(decodeToken,vendorController.updateVendor);
 router.route('/update-vendor/:vednorId').put(decodeToken,vendorController.updateVendorById);

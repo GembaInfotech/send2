@@ -259,17 +259,29 @@ const updateVendorStatus = async (req, res, next) => {
 };
 
 const getAllVendor = async (req, res, next) => {
+  // console.log("gte's vendors")
+  const gteId = req.params.gteId;
+  // console.log(gteId)
   try {
-    const vendors = await vendorModel.find().select("-password").lean();
-    if (vendors.length === 0) {
-      return res.status(404).json({ message: "No vendors found" });
-    }
-
-    res.status(200).json(vendors);
-  } catch (err) {
-    next(err);
+    const vendors = await vendorModel.find({ createdBy: gteId });
+    res.json(vendors);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
+
+
+const getVendors = async(req, res, next) => {
+  console.log("get vendors");
+  const createdBy = req.query.createdBy;
+  console.log(createdBy)
+  try {
+    const vendors = await vendorModel.find({ createdBy });
+    res.json(vendors);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
 
 const refreshToken = async (req, res) => {
@@ -418,6 +430,7 @@ module.exports = {
   updateVendor,
   updateVendorStatus,
   getAllVendor,
+  getVendors,
   updateVendorById,
   refreshToken,
   panUpload,
