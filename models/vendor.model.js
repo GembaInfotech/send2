@@ -62,6 +62,13 @@ const VendorSchema = new Schema(
       default: false
     },
 
+    businessLicenceImage: [{
+      type: String
+    }],
+    gstImage: [{
+      type: String
+    }],
+
     panImage: [{
       type: String
     }],

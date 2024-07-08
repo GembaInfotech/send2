@@ -23,9 +23,13 @@ router.route('/update-vendor-status').put(decodeToken,vendorController.updateVen
 router.delete("/logout", decodeToken,  vendorController.logout);
 router.post("/refresh-token", vendorController.refreshToken);
 
+router.route('/gst-card').post(uploadPhoto.single('file'), parkingImgResize, vendorController.gstUpload);
+router.route('/business-licence').post(uploadPhoto.single('file'), parkingImgResize, vendorController.businessLicenceUpload);
+
 router.route('/pan-image').post(uploadPhoto.single('file'), parkingImgResize, vendorController.panUpload);
 router.route('/adhaar-image').post(uploadPhoto.single('file'), parkingImgResize, vendorController.adhaarUpload);
 router.route('/profile-image').post(uploadPhoto.single('file'), parkingImgResize, vendorController.profileUpload);
+
 
 
 
