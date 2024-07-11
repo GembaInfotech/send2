@@ -18,6 +18,7 @@ const decodeToken = require("../middlewares/auth/decodeToken");
   router.route('/getguardParking/:guard_id').get(parkingController.get_parking_by_guardId);
   router.route('/pending').get( parkingController.pending);
   router.route('/approve/:id').put( parkingController.approve);
+  
   router.route('/add-new-image/:id').post(uploadPhoto.single('file'), parkingImgResize, parkingController.upload);
 
   router.route('/update-parking/:parking_id').put(decodeToken, parkingController.update_parking);

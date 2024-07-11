@@ -12,7 +12,9 @@ exports.pending = async (req, res) => {
         message: 'Vendor ID parameter is required'
       });
     }
-    const parking = await ParkingModel.find({ vendor_id: vendorId, status: "pending" });
+    const parking = await ParkingModel.find({ vendor_id: vendorId
+      // , status: "pending" 
+    });
     res.status(200).json(parking);
   } catch (error) {
     console.error('Failed to fetch parking data:', error);
