@@ -14,6 +14,8 @@ const decodeToken = require("../middlewares/auth/decodeToken");
   router.route('/search').get(parkingController.view_Parking_list);
   // router.route('/search').get(parkingController.view_Parking_list);
   router.route('/getParking/:parking_id').get(parkingController.get_parking_by_parkingId);
+  router.route('/getvendorsParkings/:vendor_id').get(parkingController.get_parkings_by_vendorId);
+
   
   router.route('/getguardParking/:guard_id').get(parkingController.get_parking_by_guardId);
   router.route('/pending').get( parkingController.pending);

@@ -5,7 +5,7 @@ const { getVendorParkings } = require("../handlers/parkingHandler/getVendorParki
 const { updateParking } = require('../handlers/parkingHandler/updateParking')
 const { getParkingByParkingId } = require('../handlers/parkingHandler/getParkingByParkingId')
 const { getParkingByGuardId } = require('../handlers/parkingHandler/getParkingByGuardId')
-
+const {getParkingsByVendorId} = require('../handlers/parkingHandler/getParkingsByVendorId')
 const { approve } = require('../handlers/parkingHandler/approve')
 const { pending } = require('../handlers/parkingHandler/pendingHandler');
 const { upload } = require('../handlers/parkingHandler/upload');
@@ -42,6 +42,15 @@ exports.pending = async (req, res) => {
     res.status(500).json(err)
   }
 }
+
+
+exports.get_parkings_by_vendorId = async (req, res) => {
+  try {
+    await getParkingsByVendorId(req, res);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 exports.get_parking_by_guardId = async (req, res) => {
   try {
