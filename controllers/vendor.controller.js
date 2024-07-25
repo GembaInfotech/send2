@@ -85,7 +85,7 @@ const signin = async (req, res, next) => {
       email: existingVendor.email,
     };
 
-    console.log("testing...1");
+  
 
     const accessToken = jwt.sign(payload, process.env.SECRET, {
       expiresIn: "30m",

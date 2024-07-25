@@ -5,7 +5,6 @@ const {getVendorParkings} = require("../handlers/parkingHandler/getVendorParking
 const {updateParking} = require('../handlers/parkingHandler/updateParking')
 const {getParkingByParkingId} = require('../handlers/parkingHandler/getParkingByParkingId')
 const {getParkingByGuardId} = require('../handlers/parkingHandler/getParkingByGuardId')
-// const getParkingByParkingId 
 const {approve}  = require('../handlers/parkingHandler/approve')
 const { pending} = require('../handlers/parkingHandler/pendingHandler')
 

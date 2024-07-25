@@ -16,7 +16,7 @@ exports.bookingStatus = async (req, res) => {
     if (!booking) return res.status(404).json({ error: "Booking not found" });
     if (booking.status === status) return res
       .status(400)
-      .json({ error: "Booking status is already completed" });
+      .json({ error: "Booking status is already parked" });
     if (status == "Parked") {
       try {
         const Guard = await GuardModel.findById(guardid)

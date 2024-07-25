@@ -17,7 +17,6 @@ const bookingSchema = new mongoose.Schema({
   actualOutTime:String,
   duration:String,
   actualDuration:Number,
-  // BookingDate: { type: Date, default: Date.now },
   BookingDate:String,
   exceedTime: Number,
   vehicleNumber: String,
