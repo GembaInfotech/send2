@@ -13,6 +13,10 @@ const bookingSchema = new mongoose.Schema({
   outTime: {
     type: String,
   },
+  is_invoice_generated:{
+    type:Boolean,
+    default: false
+  },
   actualInTime:String,
   actualOutTime:String,
   duration:String,

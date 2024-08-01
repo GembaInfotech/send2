@@ -13,6 +13,19 @@ exports.generatevendorCode  = async()=>{
      const  vendorCode = `V${String(codeNumber).padStart(9, '0')}`;
 return vendorCode;
 }
+
+exports.generateinvoiceCode = async () => {
+  console.log("codeeeeeeeeeeeeeeeee");
+  const code = await Code.findOneAndUpdate(
+    {},  // Empty filter to match any document
+    { $inc: { invoice: 1 } },  // Increment the currentCode by 1
+    { new: true}    // Create the document if it doesn't exist
+  ).select('invoice');
+  
+  const codeNumber = code.invoice;
+  const invoiceCode = `INV${String(codeNumber).padStart(9, '0')}`;
+  return invoiceCode;
+};
 exports.generateGaurdCode  = async()=>{
     const code  = await Code.findOneAndUpdate(
         {},  // Empty filter to match any document

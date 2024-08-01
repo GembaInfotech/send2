@@ -178,8 +178,8 @@ const addVendor = async (req, res, next) => {
 
   
     const vendorData = { ...req.body };
-    console.log(req.body)
-    console.log(vendorData);
+    // console.log(req.body)
+    // console.log(vendorData);
     const existingVendor = await vendorModel.findOne({ email: vendorData.email });
     console.log("extist", existingVendor);
     if (existingVendor) {
@@ -189,11 +189,11 @@ const addVendor = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(vendorData.password, 10);
-    console.log("testing..1.23");
+    // console.log("testing..1.23");
     const code = await generatevendorCode();
     console.log(code);
     const newVendor = new vendorModel({
-      code: code,
+      code,
       ...vendorData,
       password: hashedPassword,
     });

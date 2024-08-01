@@ -16,6 +16,7 @@ const vendorRoute = require('./routes/vendor.route.js')
 const paymentRoute = require('./routes/paymentRoute.js')
 const guardRoutes = require('./routes/guard.route.js')
 const parkingSpaceroute = require('./routes/parkingSpace.route.js')
+const invoiceRoute = require('./routes/invoice.route.js')
 
 const app = express();
 
@@ -67,6 +68,7 @@ app.use("/v1/api/booking", bookingRoutes)
 app.use("/v1/api/vendor", vendorRoute)
 app.use("/booking", paymentRoute)
 app.use("/v1/api/guard", guardRoutes)
+app.use('/v1/api/invoice', invoiceRoute)
 
 
 
