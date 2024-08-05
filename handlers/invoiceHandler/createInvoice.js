@@ -31,6 +31,11 @@ exports.createInvoice = async (req, res) => {
       if (vendorDetails) {
         const invoiceId = await generateinvoiceCode();
 
+        // Calculate total amount and total tax
+        const amount = parseFloat(vendor.totalPrice) || 0;
+        const total_Tax = parseFloat(vendor.totalGST) || 0;
+        const totalAmount = amount + total_Tax;
+
         const invoice = {
           invoice_no: invoiceId,
           invoice_date: new Date().toISOString().split('T')[0],
@@ -38,7 +43,9 @@ exports.createInvoice = async (req, res) => {
           to_date: endDate,
           unit_of: 'No.',
           quantity: selectedBookingIds.length,
-          total_amount: vendor.totalPrice.toString(),
+          amount: amount.toFixed(2),  // Ensure to format to two decimal places
+          total_Tax: total_Tax.toFixed(2),  // Ensure to format to two decimal places
+          total_amount: totalAmount.toFixed(2),  // Ensure to format to two decimal places
           description: `Invoice for vendor ${vendor.vendorName}`,
           vendor_id: vendor.vendorId,
           vendor_name: `${vendorDetails.firstName} ${vendorDetails.lastName}`,
@@ -70,3 +77,4 @@ exports.createInvoice = async (req, res) => {
     res.status(500).json({ message: 'Error creating invoices', error });
   }
 };
+

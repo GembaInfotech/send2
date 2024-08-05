@@ -6,6 +6,7 @@ const ParkingModel = require('../../models/parking.model');
 const parkingSpace = require('../../models/parkingSpace.model');
 const GuardModel = require('../../models/guard.model');
 const { logging } = require('googleapis/build/src/apis/logging');
+const Decimal = require('decimal.js');
 
 exports.bookingStatus = async (req, res) => {
   const { status, tp, parkedAt, guardid, spaceId } = req.body;
@@ -53,6 +54,7 @@ exports.bookingStatus = async (req, res) => {
     }
     else if (status === "Completed") {
       try {
+        console.log("Completed Status");
         const Guard = await GuardModel.findById(guardid)
 
         const ParkingSpace = await parkingSpace.findById(spaceId);
@@ -68,8 +70,9 @@ exports.bookingStatus = async (req, res) => {
         booking.checkoutBy.guardId = Guard.code
         booking.checkoutBy.guardName = Guard.name
 
-
+        
         booking.status = status;
+        console.log("status for completed", booking.status);
 
         const value = format(new Date(), "yyyy-MM-dd'T'HH:mm");
         const outDate = value.split("T")[0]
@@ -103,8 +106,26 @@ exports.bookingStatus = async (req, res) => {
         }
         booking.exceedTotalPrice = booking.exceedCGST + booking.exceedSGST + booking.exceedPrice
         booking.bookingPrice = booking.totalPrice + booking.exceedTotalPrice;
-
-        await booking.save()
+        
+        // console.log("testingggggg.......123");
+        booking.plateform_fee_percentage = 1;
+        // console.log("testing12344...")
+        booking.plateform_fee_amount = parseFloat((booking.bookingPrice * booking.plateform_fee_percentage / 100).toFixed(2));
+        // console.log("testing34345345.....");
+        booking.plateform_GST_amount = parseFloat((booking.plateform_fee_amount * 0.18).toFixed(2));
+        // console.log("testing9865.....");
+        booking.total_plateform_amount = parseFloat((parseFloat(booking.plateform_fee_amount) + parseFloat(booking.plateform_GST_amount)).toFixed(2));
+        // console.log("dsjnfkdskfn........");
+        booking.payment_amount_after_fee_deduction = parseFloat((booking.totalPrice - booking.total_plateform_amount).toFixed(2));
+        
+        // console.log("testing.....");
+        try {
+          // console.log("testtinggggggg.....");
+          await booking.save()
+        } catch (error) {
+          console.log(error);
+        }
+        console.log(booking);
         res
           .status(200)
           .json({ message: "Booking status updated successfully", data: booking });

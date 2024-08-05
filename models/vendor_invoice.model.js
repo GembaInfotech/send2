@@ -30,8 +30,16 @@ const VendorInvoiceSchema = new Schema(
     quantity: {
       type: String,
     },
+    amount:{
+      type:String,
+      require:true
+    },
     total_amount: {
       type: String,
+    },
+    total_Tax:{
+      type:String,
+      require:true
     },
     description: {
       type: String,

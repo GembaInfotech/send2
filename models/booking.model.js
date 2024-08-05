@@ -17,6 +17,13 @@ const bookingSchema = new mongoose.Schema({
     type:Boolean,
     default: false
   },
+  
+  plateform_fee_percentage: String,
+  plateform_fee_amount: String,
+  plateform_GST_amount: String,
+  total_plateform_amount: String,
+  payment_amount_after_fee_deduction: String,
+
   actualInTime:String,
   actualOutTime:String,
   duration:String,
