@@ -19,7 +19,7 @@ const decodeToken = require("../middlewares/auth/decodeToken");
   //for guard
   router.route('/getguardParking/:guard_id').get(parkingController.get_parking_by_guardId);
   router.route('/pending').get( parkingController.pending);
-  router.route('/approve/:id').put( parkingController.approve);
+  // router.route('/approve/:id').put( parkingController.approve);
 
   
 
