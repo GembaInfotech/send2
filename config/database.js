@@ -1,14 +1,9 @@
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
-
 class Database {
-  constructor(uri, options = {}) {
+  constructor(uri, options) {
     this.uri = uri;
-    this.options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      ...options,
-    };
+    this.options = options;
   }
 
   async connect() {
@@ -18,12 +13,7 @@ class Database {
         `Connected to database: ${mongoose.connection.db.databaseName}`
       );
     } catch (error) {
-      console.error(
-        `[${new Date().toISOString()}] Error connecting to database:`,
-        error
-      );
-      // Retry logic could be added here
-      process.exit(1); // Optionally exit the process if a critical failure
+      throw error;
     }
   }
 
@@ -34,10 +24,7 @@ class Database {
         `Disconnected from database: ${mongoose.connection.db.databaseName}`
       );
     } catch (error) {
-      console.error(
-        `[${new Date().toISOString()}] Error disconnecting from database:`,
-        error
-      );
+      throw error;
     }
   }
 }
