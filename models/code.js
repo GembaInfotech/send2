@@ -12,6 +12,10 @@ const codeSchema = new Schema(
       type: Number,
       default: 0
     },
+    voucher: {
+      type: Number,
+      default: 0
+    },
     parking: {
       type: Number,
       default: 0

@@ -26,6 +26,19 @@ exports.generateinvoiceCode = async () => {
   const invoiceCode = `INV${String(codeNumber).padStart(9, '0')}`;
   return invoiceCode;
 };
+
+exports.generatevoucherCode = async () => {
+  console.log("codeeeeeeeeeeeeeeeee");
+  const code = await Code.findOneAndUpdate(
+    {},  // Empty filter to match any document
+    { $inc: { voucher: 1 } },  // Increment the currentCode by 1
+    { new: true}    // Create the document if it doesn't exist
+  ).select('voucher');
+  
+  const codeNumber = code.voucher;
+  const voucherCode = `VOU${String(codeNumber).padStart(9, '0')}`;
+  return voucherCode;
+};
 exports.generateGaurdCode  = async()=>{
     const code  = await Code.findOneAndUpdate(
         {},  // Empty filter to match any document
