@@ -6,10 +6,10 @@ const { updateParking } = require('../handlers/parkingHandler/updateParking')
 const { getParkingByParkingId } = require('../handlers/parkingHandler/getParkingByParkingId')
 const { getParkingByGuardId } = require('../handlers/parkingHandler/getParkingByGuardId')
 const {getParkingsByVendorId} = require('../handlers/parkingHandler/getParkingsByVendorId')
-const { approve } = require('../handlers/parkingHandler/approve')
+// const { approve } = require('../handlers/parkingHandler/approveParking')
 const { pending } = require('../handlers/parkingHandler/pendingHandler');
 const { upload } = require('../handlers/parkingHandler/upload');
-
+const { approve } = require('../handlers/parkingHandler/approveParking');
 exports.view_Parking_list = async (req, res) => {
   try {
     await viewParkingList(req, res);

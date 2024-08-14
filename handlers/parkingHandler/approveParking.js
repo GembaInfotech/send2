@@ -1,5 +1,5 @@
 const ParkingModel = require('../../models/parking.model')
-const VendorModel = require('../../models/vendor.model')
+// const VendorModel = require('../../models/vendor.model')
 
 exports.approve = async (req, res) => {
   try {
