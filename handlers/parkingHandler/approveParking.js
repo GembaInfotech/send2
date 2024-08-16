@@ -6,7 +6,8 @@ exports.approve = async (req, res) => {
     const {id} =req.params;
     const {status } = req.query
     console.log(req.params);
-    console.log(req.query)
+    console.log("staus for approval", req.query)
+    console.log("staus for approval 2", status)
     const parking = await ParkingModel.findById(id)
     if (!parking) {
       return res.status(404).json({
