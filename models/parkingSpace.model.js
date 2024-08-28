@@ -9,7 +9,10 @@ const ParkingSpaceSchema = new Schema(
         type: String,
           enum: ["fourWheeler", "twoWheeler"],
     },
-    parkingCode:String,
+    parkingCode:{
+      type:String,
+      index:true
+    },
   isOccupied: { type: Boolean, default: false }
   }
 );

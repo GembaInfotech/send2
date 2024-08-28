@@ -174,7 +174,9 @@ const ParkingSchema = new Schema(
     },
 
     vendor_id: {
-      type: String
+      type: Schema.Types.ObjectId,
+      ref: 'VendorModel',
+      required: true,
     },
     guard_id: [
       {

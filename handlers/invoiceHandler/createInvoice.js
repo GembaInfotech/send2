@@ -4,6 +4,8 @@ const InvoiceModel = require('../../models/vendor_invoice.model');
 const voucherModel = require('../../models/vendor_voucher.model')
 const nodemailer = require('nodemailer');
 const { generateinvoiceCode, generatevoucherCode } = require('../../handlers/codeHandler/Codes');
+const {sendVerificationEmail} = require('../../utils/nodemailer.js')
+const {InvoiceCreationTemplate} = require ('../../emailTemplate/InvoiceCreation.js')
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -83,16 +85,16 @@ exports.createInvoice = async (req, res) => {
           invoice_link: `http://localhost:5173/invoice#/invoice/${invoiceId}`
         };
 
+        // Dear ${vendorDetails.firstName},\n\nYour invoice is ready for ${startDate} to ${endDate}. You can download it from the following link:\n\n${invoice.invoice_link}\n\nBest regards,\nYour Company
+
         invoices.push(invoice);
 
-        const mailOptions = {
-          from: 'prashantrana9516@gmail.com',
-          to: 's.yadav@gembainfotech.com', // Assuming vendorDetails has an email field
-          subject: 'Your Invoice',
-          text: `Dear ${vendorDetails.firstName},\n\nYour invoice is ready for ${startDate} to ${endDate}. You can download it from the following link:\n\n${invoice.invoice_link}\n\nBest regards,\nYour Company`
-        };
-
-        await transporter.sendMail(mailOptions);
+        const customizedTemplate = InvoiceCreationTemplate
+        .replace('%NAME%', vendorDetails.firstName)
+        .replace('%FROM%', startDate)
+        .replace('%TO%', endDate)
+        .replace('%LINK%', invoice.invoice_link);
+              sendVerificationEmail(vendorDetails, customizedTemplate);
       }
     }
 

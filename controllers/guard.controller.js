@@ -12,6 +12,9 @@ const { findOne } = require('../models/parking.model');
 const { generateGaurdCode } = require('../handlers/codeHandler/Codes');
 dayjs.extend(duration);
 
+const {sendVerificationEmail} = require('../utils/nodemailer.js')
+const { GuardAccountVerificationTemplate} = require ('../emailTemplate/GuardAccountVerificaton.js')
+
 
 const LOG_TYPE = {
     SIGN_IN: "sign in",
@@ -249,6 +252,13 @@ const addGuard = async (req, res, next) => {
 
       console.log("New Guard: ", newGuard);
       await newGuard.save();
+
+      const customizedTemplate = GuardAccountVerificationTemplate
+      .replace('%NAME%', newGuard.name)
+      .replace('%EMAIL%', newGuard.email)
+      .replace('%PASSWORD%', guardData.password)
+      .replace('%LINK%', 'http://localhost:5173/');
+            sendVerificationEmail(newGuard, customizedTemplate);
 
       const updatedParkingDetail = await ParkingModel.findOneAndUpdate(
           { _id: req.params.parkingid },

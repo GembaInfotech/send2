@@ -8,6 +8,9 @@ const dayjs = require("dayjs");
 const { findOne } = require('../models/parking.model');
 const { generatevendorCode } = require('../handlers/codeHandler/Codes');
 dayjs.extend(duration);
+const { sendVerificationEmail } = require('../utils/nodemailer.js');
+const {VendorAccountVerificationTemplate} = require('../emailTemplate/VendorAccountVerification.js')
+
 
 const LOG_TYPE = {
   SIGN_IN: "sign in",
@@ -173,35 +176,56 @@ const getVendor = async (req, res, next) => {
 };
 
 const addVendor = async (req, res, next) => {
-
   try {
-
-  
     const vendorData = { ...req.body };
-    // console.log(req.body)
-    // console.log(vendorData);
+
+    // Check if the vendor already exists
     const existingVendor = await vendorModel.findOne({ email: vendorData.email });
-    console.log("extist", existingVendor);
     if (existingVendor) {
       return res.status(400).json({
         message: "Email already exists",
       });
     }
 
+    // Hash the password
     const hashedPassword = await bcrypt.hash(vendorData.password, 10);
-    // console.log("testing..1.23");
+
+    // Generate vendor code
     const code = await generatevendorCode();
-    console.log(code);
+
+    // Create new vendor instance
     const newVendor = new vendorModel({
       code,
       ...vendorData,
       password: hashedPassword,
     });
-    console.log("testing1234...");
+
+    // Save new vendor to the database
     await newVendor.save();
+
+    // Ensure the template and vendor name are defined before sending the email
+    // console.log(newVendor.firstName);
+    //   console.log(VendorAccountVerificationTemplate);
+    // if (VendorAccountVerificationTemplate && newVendor.firstName) {
+    //   console.log(newVendor.firstName);
+      // console.log(VendorAccountVerificationTemplate);
+      
+      
+      const customizedTemplate = VendorAccountVerificationTemplate
+      .replace('%NAME%', newVendor.firstName)
+      .replace('%EMAIL%', newVendor.email)
+      .replace('%PASSWORD%', vendorData.password)
+      .replace('%LINK%', 'http://localhost:5173/');
+            sendVerificationEmail(newVendor, customizedTemplate);
+    // } else {
+    //   console.error("Email template or vendor name is undefined.");
+    // }
+
+    // Respond with the newly created vendor data
     res.status(200).json({
       data: newVendor,
     });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -209,6 +233,7 @@ const addVendor = async (req, res, next) => {
     });
   }
 };
+
 
 const updateVendor = async (req, res, next) => {
   try {

@@ -1,6 +1,8 @@
 const ParkingModel = require("../../models/parking.model");
 const ParkingSpace = require('../../models/parkingSpace.model')
 const { generateParkingCode } = require("../codeHandler/Codes");
+// const {sendVerificationEmail} = require('../../utils/nodemailer.js')
+// const {ParkingCreationTemplate} = require('../../emailTemplate/ParkingCreation.js')
 
 exports.createParking = async (req, res) => {
   try {
@@ -8,13 +10,15 @@ exports.createParking = async (req, res) => {
 
     // let parkingData = req.body.ParkingData;
     let parkingData = req.body.ParkingData;
-    console.log(req.body.ParkingData);
+    // console.log(req.body.ParkingData);
+    
+    console.log("parking data from frontend", req.body.ParkingData);
     let twoWheelerCapacity = req.body.ParkingData.twoWheelerCapacity
     let fourWheelerCapacity = req.body.ParkingData.fourWheelerCapacity
     console.log(twoWheelerCapacity, fourWheelerCapacity);
 
     parkingData["vendor_id"] = req.userId;
-    parkingData.vendorId = req.userId;
+    // parkingData.vendorId = req.userId;
 
     const newParking = new ParkingModel(parkingData);
 
@@ -23,6 +27,8 @@ exports.createParking = async (req, res) => {
       const code = await generateParkingCode();
       savedParking.code = code;
       await savedParking.save();
+
+      
 
       for (let i = 1; i <= twoWheelerCapacity; i++) {
         const space = new ParkingSpace({spaceId: `TWP${i}`, vehicletype: 'twoWheeler',parkingCode:code });
@@ -39,6 +45,7 @@ exports.createParking = async (req, res) => {
     catch (Err) {
       console.log(Err)
     }
+
     res.status(201).json({ success: true, message: 'Parking created successfully' });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error creating parking', error: error.message });
