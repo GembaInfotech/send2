@@ -4,7 +4,7 @@ const ParkingCreationTemplate = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Template</title>
+    <title>Parking Creation Notification</title>
     <style>
         .email-container {
             max-width: 670px;
@@ -56,12 +56,13 @@ const ParkingCreationTemplate = `<!DOCTYPE html>
         <!-- Content Section -->
         <div class="content">
             <h1>Dear %NAME%,</h1>
-            <p>Thank you for partnering with us. Please find your invoice details below:</p>
-            <p><strong>From Date:</strong> %FROM% </p>
-            <p><strong>To Date:</strong> %TO% </p>
-            <p><strong>Invoice Download Link:</strong> <a href="%LINK%" target="_blank">Click here to download your Invoice</a></p>
-            <p>If you have any questions or need assistance, please do not hesitate to contact our support team at <a href="mailto:support@gembainfotech.com">support@gembainfotech.com</a>. We're here to help you every step of the way.</p>
-            <p>Welcome to Gemba Infotech, where we are committed to providing you with top-notch services and solutions.</p>
+            <p>We are pleased to inform you that your parking area has been successfully created. Below are the details of the parking area:</p>
+            <p><strong>Parking Name:</strong> %PARKING_NAME%</p>
+            <p><strong>Parking Address:</strong> %PARKING_ADDRESS%</p>
+            <p><strong>Validity Date:</strong> From %VALIDITY_FROM% to %VALIDITY_TO%</p>
+            <p>Our team is currently reviewing the details you have provided. You will receive a confirmation email once your parking area has been approved by our team.</p>
+            <p>We appreciate your partnership with us and look forward to providing you with the best service. If you have any questions or need further assistance, feel free to reach out to our support team at <a href="mailto:support@gembainfotech.com">support@gembainfotech.com</a>.</p>
+            <p>Thank you for choosing Gemba Infotech as your trusted partner.</p>
             <p>Warm regards,<br>Gemba Infotech Team<br><a href="mailto:support@gembainfotech.com">support@gembainfotech.com</a></p>
         </div>
     </div>
