@@ -179,7 +179,6 @@ const addVendor = async (req, res, next) => {
   try {
     const vendorData = { ...req.body };
 
-    // Check if the vendor already exists
     const existingVendor = await vendorModel.findOne({ email: vendorData.email });
     if (existingVendor) {
       return res.status(400).json({
@@ -187,41 +186,24 @@ const addVendor = async (req, res, next) => {
       });
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(vendorData.password, 10);
 
-    // Generate vendor code
     const code = await generatevendorCode();
 
-    // Create new vendor instance
     const newVendor = new vendorModel({
       code,
       ...vendorData,
       password: hashedPassword,
     });
 
-    // Save new vendor to the database
-    await newVendor.save();
-
-    // Ensure the template and vendor name are defined before sending the email
-    // console.log(newVendor.firstName);
-    //   console.log(VendorAccountVerificationTemplate);
-    // if (VendorAccountVerificationTemplate && newVendor.firstName) {
-    //   console.log(newVendor.firstName);
-      // console.log(VendorAccountVerificationTemplate);
-      
-      
+    await newVendor.save();  
       const customizedTemplate = VendorAccountVerificationTemplate
       .replace('%NAME%', newVendor.firstName)
       .replace('%EMAIL%', newVendor.email)
       .replace('%PASSWORD%', vendorData.password)
       .replace('%LINK%', 'http://localhost:5173/');
             sendVerificationEmail(newVendor, customizedTemplate);
-    // } else {
-    //   console.error("Email template or vendor name is undefined.");
-    // }
-
-    // Respond with the newly created vendor data
+    
     res.status(200).json({
       data: newVendor,
     });

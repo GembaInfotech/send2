@@ -5,7 +5,10 @@ exports.getParkingSpace = async (req, res) => {
     const parkingCode = req.params.Parkingcode;
     console.log(req.params);
     console.log(parkingCode);
-    const parkingSpace = await ParkingSpace.find({parkingCode:parkingCode});
+    const parkingSpace = await ParkingSpace.find({
+      parkingCode: parkingCode,
+      isOccupied: false
+    });
     console.log(parkingSpace);
     if (!parkingSpace) {
       return res.status(404).json({
