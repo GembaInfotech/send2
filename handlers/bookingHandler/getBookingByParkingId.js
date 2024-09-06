@@ -1,5 +1,3 @@
-const BookingModel = require('../../models/booking.model')
-
 exports.getBookingByParkingId = async (req, res) => {
     try {
         let parkingIds = req.query.parking;
@@ -10,24 +8,19 @@ exports.getBookingByParkingId = async (req, res) => {
         
         let limit = parseInt(req.query.limit) || 10; 
         console.log(limit);
+        
+
+        // console.log(parkingIds);
 
         const parkingIdsArray = parkingIds.includes(",") ? parkingIds.split(",") : [parkingIds];
 
-        // Find bookings and populate user and vehicle details
         const bookings = await BookingModel.find({ parking: { $in: parkingIdsArray } })
             .skip((page - 1) * limit)
-            .limit(limit)
-            .populate({
-                path: 'user', // Populate the user information
-                select: 'vehicle', // Only fetch the vehicle details from the user
-                populate: {
-                    path: 'vehicle', // Fetch the vehicle details if it's a subdocument
-                    match: { _id: { $eq: '$vehicleId' } }, // Match the vehicleId from the booking
-                    select: 'vehicle_name vehicle_number vehicle_type', // Only select relevant fields
-                }
-            });
+            .limit(limit);
 
         const totalBookings = await BookingModel.countDocuments({ parking: { $in: parkingIdsArray } });
+
+        console.log(bookings);
 
         res.status(200).json({
             bookings,
@@ -42,4 +35,3 @@ exports.getBookingByParkingId = async (req, res) => {
         });
     }
 };
-

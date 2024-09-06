@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
 const Database = require("../config/database");
 const bookingSchema = new mongoose.Schema({
-  user: {
-    type: String
+  code:{
+    type:String
   },
-  parking: {
-    type: String 
-  },
+  parking: { type: mongoose.Schema.Types.ObjectId, ref: 'Parking' },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  vehicleId: { type: mongoose.Schema.Types.ObjectId },
+  vendor: { type: mongoose.Schema.Types.ObjectId, ref: 'VendorModel' },
   inTime: {
     type: String,
   },
