@@ -1,15 +1,12 @@
 const cron = require('node-cron');
 const ParkingModel = require('../models/parking.model')
-
 const updateParkingStatus = async () => {
     try {
       const today = new Date().toISOString().split('T')[0]; // Get today's date in 'YYYY-MM-DD' format
-  
       const result = await ParkingModel.updateMany(
         { validity_ToDate: { $lt: today } },
         { $set: { status: 'inactive' } }
       );
-  
       // Log based on Mongoose version
       if (result.nModified !== undefined) {
         console.log(`${result.nModified} parking records updated to inactive.`);
