@@ -24,6 +24,9 @@ const guardSchema = new Schema({
   address: {
     type: String,
   },
+  profileImage:{
+    type:String
+  },
   aadhar: {
     type: String,
   },

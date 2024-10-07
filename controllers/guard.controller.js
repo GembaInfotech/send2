@@ -11,6 +11,8 @@ const dayjs = require("dayjs");
 const { findOne } = require('../models/parking.model');
 const { generateGaurdCode } = require('../handlers/codeHandler/Codes');
 dayjs.extend(duration);
+const path = require('path');
+
 
 const {sendVerificationEmail} = require('../utils/nodemailer.js')
 const { GuardAccountVerificationTemplate} = require ('../emailTemplate/GuardAccountVerificaton.js')
@@ -278,6 +280,40 @@ const addGuard = async (req, res, next) => {
   }
 };
 
+const UploadGuardProfile = async (req, res) => {
+  const guard = req.guard;
+
+  if (!req.file) {
+    return res.status(400).send({ message: 'Please upload a file.' });
+  }
+
+  const profileType = req.body.profileType || 'Guard'; // Default to 'Guard' if not provided
+  let folder = '';
+
+  if (profileType === 'Guard') {
+    folder = 'GuardProfileImg';
+  } else if (profileType === 'vendor') {
+    folder = 'VendorProfileImg';
+  } else {
+    return res.status(400).send({ message: 'Invalid profile type.' });
+  }
+
+  // Update guard with the file name
+  guard.profileImage = req.file.filename;
+
+  try {
+    // Save the guard with the updated profile image
+    await guard.save();
+
+    res.send({
+      message: 'File uploaded and saved successfully!',
+      fileName: req.file.filename,
+      filePath: path.join('ProfileImage', folder, req.file.filename)
+    });
+  } catch (error) {
+    res.status(500).send({ message: 'Error saving file info to guard profile.' });
+  }
+};
 const getGuard = async (req, res, next) => {
     try {
         const guardId = req.params.guardId; // Assuming the guard id is passed as req.params.id
@@ -405,6 +441,7 @@ const getAllGuardsByVendorId = async (req, res, next) => {
     getGuard,
     getGuardsByParkingId,
     updateGuard ,
-    getAllGuardsByVendorId 
+    getAllGuardsByVendorId,
+    UploadGuardProfile,
   };
   
