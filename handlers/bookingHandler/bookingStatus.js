@@ -9,7 +9,7 @@ const { logging } = require('googleapis/build/src/apis/logging');
 const Decimal = require('decimal.js');
 
 exports.bookingStatus = async (req, res) => {
-  const { status, tp, parkedAt, guardid, spaceId } = req.body;
+  const { status,parkedAt, guardid, spaceId } = req.body;
   try {
     const { bookingId } = req.params;
     const booking = await BookingModel.findById(bookingId);
@@ -76,8 +76,8 @@ exports.bookingStatus = async (req, res) => {
        console.log(new Date());
         booking.actualOutTime = format(new Date(), "yyyy-MM-dd'T'HH:mm");
         booking.duration = differenceInMinutes(booking.outTime, booking.inTime);
-        booking.actualDuration = differenceInMinutes(booking.actualOutTime, booking.actualInTime);
-        const unit = booking.actualDuration - booking.duration- 8;
+        booking.actualDuration = differenceInMinutes(booking.actualOutTime, booking.inTime);
+        const unit = booking.actualDuration - booking.duration - process.env.NON_CONSIDERABLE_EXCEED_TIME_IN_MINUTE;
 
         if (unit > 0 && outDate <= validityDate) {
           const exceedPrice = booking.vehicle_type== "two wheeler"?  Parking.exceed_priceT : Parking.exceed_priceF;
