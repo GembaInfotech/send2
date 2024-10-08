@@ -10,6 +10,8 @@ const Decimal = require('decimal.js');
 
 exports.bookingStatus = async (req, res) => {
   const { status,parkedAt, guardid, spaceId } = req.body;
+
+  console.log("req.body", req.body)
   try {
     const { bookingId } = req.params;
     const booking = await BookingModel.findById(bookingId);
@@ -20,7 +22,11 @@ exports.bookingStatus = async (req, res) => {
     if (status == "Parked") {
       try {
         const Guard = await GuardModel.findById(guardid)
+
         const ParkingSpace = await parkingSpace.findById(spaceId);
+
+        console.log("ParkingSpace", ParkingSpace);
+        
         if (!ParkingSpace) return res.status(404).json({ error: "Parking Space not found" });
         if (ParkingSpace.isOccupied) {
           return res.status(405).json({ error: "Space is already Occupied" })

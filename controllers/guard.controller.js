@@ -95,6 +95,7 @@ const signin = async (req, res, next) => {
       const payload = {
         id: existingGuard._id,
         email: existingGuard.email,
+        profile:existingGuard?.profileImage
       };
   
       console.log("testing...1");
@@ -134,7 +135,9 @@ const signin = async (req, res, next) => {
           _id: existingGuard._id,
           name: existingGuard.name,
           email: existingGuard.email,
-          parking:existingGuard.parking
+          parking:existingGuard.parking,
+          profile:existingGuard?.profileImage
+
         },
       });
     } catch (err) {
