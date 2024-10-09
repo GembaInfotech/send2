@@ -13,6 +13,7 @@ const guardAuthentication = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.SECRET);
     req.guardId = decoded.id;
+    req.type = 2;
 
     const guard = await guardModel.findById(req.guardId);
 

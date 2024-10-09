@@ -1,6 +1,7 @@
 const vendorModel = require('../models/vendor.model')
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const path = require('path'); 
 const vendorToken = require("../models/vendorToken.model")
 const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const duration = require("dayjs/plugin/duration");
@@ -216,7 +217,6 @@ const addVendor = async (req, res, next) => {
   }
 };
 
-
 const updateVendor = async (req, res, next) => {
   try {
     const id = req.userId;
@@ -277,7 +277,6 @@ const getAllVendor = async (req, res, next) => {
   }
 };
 
-
 const getVendors = async(req, res, next) => {
   console.log("get vendors");
   const createdBy = req.query.createdBy;
@@ -289,7 +288,6 @@ const getVendors = async(req, res, next) => {
     res.status(500).json({ error: error.message });
   }
 }
-
 
 const refreshToken = async (req, res) => {
   try {
@@ -343,17 +341,13 @@ const refreshToken = async (req, res) => {
 
 const gstUpload = async (req, res) => {
   try {
-      // console.log(req.body, req.params, req.userId);
-      const {id} = req.body;
-      console.log(id);
-    // Check if the vendor ID is valid
+
+    const {id} = req.body;
     const isValidVendor = await vendorModel.exists({ _id: id });
     console.log(isValidVendor);
     if (!isValidVendor) {
       return res.status(404).json({ success: false, message: 'Vendor not found for the given vendor ID' });
     }
-
-    // Update the parking
     const updatedVendor = await vendorModel.findByIdAndUpdate(id, 
       { $push: { gstImage : req?.imagepath.url } }
 
@@ -370,8 +364,6 @@ const gstUpload = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error updating vendor', error: error.message });
   }
 };
-
-
 
 const businessLicenceUpload = async (req, res) => {
   try {
@@ -404,94 +396,152 @@ const businessLicenceUpload = async (req, res) => {
 };
 
 const panUpload = async (req, res) => {
+  const { id } = req.body; // Get the vendor ID from the request body
+
   try {
-      // console.log(req.body, req.params, req.userId);
-      const {id} = req.body;
-      console.log(id);
-    // Check if the vendor ID is valid
-    const isValidVendor = await vendorModel.exists({ _id: id });
-    console.log(isValidVendor);
-    if (!isValidVendor) {
+    // Find the vendor by ID
+    const vendor = await vendorModel.findById(id);
+    if (!vendor) {
       return res.status(404).json({ success: false, message: 'Vendor not found for the given vendor ID' });
     }
 
-    // Update the parking
-    const updatedVendor = await vendorModel.findByIdAndUpdate(id, 
-      { $push: { panImage : req?.imagepath.url } }
-
-      , { new: true });
-    console.log(updatedVendor);
-
-    if (!updatedVendor) {
-      return res.status(404).json({ success: false, message: 'Vendor not found' });
+    // Check if the files were uploaded
+    if (!req.files || req.files.length === 0) { // Ensure req.files exists and is not empty
+      return res.status(400).json({ success: false, message: 'Please upload a file.' });
     }
 
-    res.status(200).json({ success: true, message: 'Vendor updated successfully', vendor: updatedVendor });
+    // Determine the folder based on upload type
+    const uploadType = req.body.uploadType; 
+    let folder = '';
+
+    switch (uploadType) {
+      case 'vendorGST':
+        folder = 'VendorGST';
+        break;
+      case 'vendorAadhar':
+        folder = 'VendorAadhar';
+        break;
+      case 'vendorLicense':
+        folder = 'VendorLicense';
+        break;
+      case 'vendorPan':
+        folder = 'VendorPan';
+        break;
+      default:
+        return res.status(400).json({ success: false, message: 'Invalid upload type' });
+    }
+
+    // Clear existing panImage array and prepare to add new images
+    vendor.panImage = []; // Replace existing images with an empty array
+    req.files.forEach(uploadedFile => {
+      const imagePath = path.join('ProfileImage', folder, uploadedFile.filename); 
+      vendor.panImage.push(imagePath); // Push the new image path to the array
+    });
+
+    await vendor.save(); // Save the updated vendor information
+
+    // Respond with success message and file information
+    res.status(200).json({
+      success: true,
+      message: 'Files uploaded and saved successfully!',
+      files: req.files.map(file => ({
+        fileName: file.filename,
+        filePath: path.join('ProfileImage', folder, file.filename),
+      })), 
+    });
+
   } catch (error) {
-      console.log(error)
+    console.error(error); // Log the error for debugging
     res.status(500).json({ success: false, message: 'Error updating vendor', error: error.message });
   }
 };
-
 
 const adhaarUpload = async (req, res) => {
+  const { id } = req.body; 
   try {
-      // console.log(req.body, req.params, req.userId);
-      const {id} = req.body;
-      console.log(id);
-    // Check if the vendor ID is valid
-    const isValidVendor = await vendorModel.exists({ _id: id });
-    console.log(isValidVendor);
-    if (!isValidVendor) {
+    const vendor = await vendorModel.findById(id);
+    if (!vendor) {
       return res.status(404).json({ success: false, message: 'Vendor not found for the given vendor ID' });
     }
-
-    // Update the parking
-    const updatedVendor = await vendorModel.findByIdAndUpdate(id, 
-      { $push: { adhaarImage : req?.imagepath.url } }
-
-      , { new: true });
-    console.log(updatedVendor);
-
-    if (!updatedVendor) {
-      return res.status(404).json({ success: false, message: 'Vendor not found' });
+    if (!req.files || req.files.length === 0) { 
+      return res.status(400).json({ success: false, message: 'Please upload a file.' });
     }
+    const uploadType = req.body.uploadType; 
+    let folder = '';
 
-    res.status(200).json({ success: true, message: 'Vendor updated successfully', vendor: updatedVendor });
+    switch (uploadType) {
+      case 'vendorGST':
+        folder = 'VendorGST';
+        break;
+      case 'vendorAadhar':
+        folder = 'VendorAadhar';
+        break;
+      case 'vendorLicense':
+        folder = 'VendorLicense';
+        break;
+      case 'vendorPan':
+        folder = 'VendorPan';
+        break;
+      default:
+        return res.status(400).json({ success: false, message: 'Invalid upload type' });
+    }
+    vendor.adhaarImage = []; 
+    req.files.forEach(uploadedFile => {
+      const imagePath = path.join('ProfileImage', folder, uploadedFile.filename); 
+      vendor.adhaarImage.push(imagePath); 
+    });
+
+    await vendor.save(); 
+    res.status(200).json({
+      success: true,
+      message: 'Files uploaded and saved successfully!',
+      files: req.files.map(file => ({
+        fileName: file.filename,
+        filePath: path.join('ProfileImage', folder, file.filename),
+      })), 
+    });
+
   } catch (error) {
-      console.log(error)
+    console.error(error); 
     res.status(500).json({ success: false, message: 'Error updating vendor', error: error.message });
   }
 };
+
 const profileUpload = async (req, res) => {
+  const {id} = req.body;
   try {
-      // console.log(req.body, req.params, req.userId);
-      const {id} = req.body;
-      console.log(id);
-    // Check if the vendor ID is valid
-    const isValidVendor = await vendorModel.exists({ _id: id });
-    console.log(isValidVendor);
-    if (!isValidVendor) {
+    const vendor = await vendorModel.findById({_id:id});
+
+    if (!vendor) {
       return res.status(404).json({ success: false, message: 'Vendor not found for the given vendor ID' });
     }
 
-    // Update the parking
-    const updatedVendor = await vendorModel.findByIdAndUpdate(id, 
-      { $push: { profileImage : req?.imagepath.url } }
-
-      , { new: true });
-    console.log(updatedVendor);
-
-    if (!updatedVendor) {
-      return res.status(404).json({ success: false, message: 'Vendor not found' });
+    if (!req.file) {
+      return res.status(400).json({ message: 'Please upload a file.' });
     }
+    const profileType = req.body.type || 1; 
+    let folder = '';
 
-    res.status(200).json({ success: true, message: 'Vendor updated successfully', vendor: updatedVendor });
+    if (profileType === 2) {
+      folder = 'GuardProfileImg';
+    } else if (profileType === 1) {
+      folder = 'VendorProfileImg';
+    } else {
+      return res.status(400).json({ message: 'Invalid profile type.' });
+    }
+    vendor.profileImage = path.join('ProfileImage', folder, req.file.filename);
+    await vendor.save();
+    res.json({
+      message: 'File uploaded and saved successfully!',
+      fileName: req.file.filename,
+      filePath: vendor.profileImage, 
+    });
   } catch (error) {
-      console.log(error)
-    res.status(500).json({ success: false, message: 'Error updating vendor', error: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Error saving file info to vendor profile.', error });
   }
 };
+
 module.exports = {
   addVendor,
   signin,

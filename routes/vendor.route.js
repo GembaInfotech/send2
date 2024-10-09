@@ -3,6 +3,9 @@ const router = require("express").Router();
 const vendorController = require("../controllers/vendor.controller")
 const decodeToken = require("../middlewares/auth/decodeToken");
 const { uploadPhoto, parkingImgResize } = require("../middlewares/ImageUpload/upload");
+const upload = require("../utils/UploadImage/upload")
+const uploadMultipleForVendor = require('../utils/UploadImage/uploadMultiple')
+
 router.route('/create-new-vendor').post(vendorController.addVendor);
 router.route('/vendor-login').post( vendorController.signin);
 router.route('/get-vendor').get(decodeToken,vendorController.getVendor);
@@ -19,11 +22,9 @@ router.post("/refresh-token", vendorController.refreshToken);
 router.route('/gst-card').post(uploadPhoto.single('file'), parkingImgResize, vendorController.gstUpload);
 router.route('/business-licence').post(uploadPhoto.single('file'), parkingImgResize, vendorController.businessLicenceUpload);
 
-router.route('/pan-image').post(uploadPhoto.single('file'), parkingImgResize, vendorController.panUpload);
-router.route('/adhaar-image').post(uploadPhoto.single('file'), parkingImgResize, vendorController.adhaarUpload);
-router.route('/profile-image').post(uploadPhoto.single('file'), parkingImgResize, vendorController.profileUpload);
-
-
-
+router.route('/pan-image').post(uploadMultipleForVendor, vendorController.panUpload);
+router.route('/adhaar-image').post(uploadMultipleForVendor, vendorController.adhaarUpload);
+// router.route('/profile-image').post(uploadPhoto.single('file'), parkingImgResize, vendorController.profileUpload);
+router.route('/profile-image').post(upload.single('profileImage'),vendorController.profileUpload);
 
 module.exports =router

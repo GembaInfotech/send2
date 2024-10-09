@@ -1,18 +1,19 @@
+const { log } = require('console');
 const multer = require('multer');
 const path = require('path');
 
 // Set up storage engine
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
+        // console.log(req.type)
         
-        
-        const profileType = 'Guard'; // Get the profile type from the request body
+        let profileType = req.type || 1; // Get the profile type from the request body
 
         let folder = '';
 
-        if (profileType === 'Guard') {
+        if (profileType === 2) {
             folder = 'GuardProfileImg';
-        } else if (profileType === 'vendor') {
+        } else if (profileType === 1) {
             folder = 'VendorProfileImg';
         } else {
             return cb(new Error('Invalid profile type'));
