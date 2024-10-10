@@ -180,51 +180,27 @@ const signin = async (req, res, next) => {
       });
     }
   };
+
+const changePassword = async (req, res) => {
+  try {
+
+    const guard = req.guard;
+    const { currentPassword, newPassword } = req.body;
+    const isMatch = await bcrypt.compare(currentPassword, guard.password);
+    // if (!isMatch) {
+    //   return res.status(400).json({ message: 'Current password is incorrect' });
+    // }
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    guard.password = hashedNewPassword;
+    await guard.save();
+
+    res.status(200).json({ message: 'Password changed successfully' });
+  } catch (err) {
+    console.error('Error changing password:', err.message);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
   
-//   const addGuard = async (req, res, next) => {
-//     try {
-//         const guardData = { ...req.body };
-//         console.log(guardData);
-
-//         const existingGuard = await GuardModel.findOne({ email: guardData.email });
-//         console.log("exist", existingGuard);
-
-//         if (existingGuard) {
-//             return res.status(400).json({
-//                 message: "Email already exists",
-//             });
-//         }
-
-//         // Hash the password before saving
-//         const hashedPassword = await bcrypt.hash(guardData.password, 10);
-
-//         const newGuard = new GuardModel({
-//             ...guardData,
-//             password: hashedPassword,
-//         });
-
-//         console.log("New Guard: ", newGuard);
-//         await newGuard.save();
-
-//         const updatedParkingDetail = await ParkingModel.findOneAndUpdate(
-//             { _id: req.params.parkingid },
-//             { $push: { guard_id: newGuard._id } },
-//             { new: true }
-//         );
-
-//         res.status(200).json({
-//             data: newGuard,
-//             updatedParkingDetail
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({
-//             message: "Failed to add Guard",
-//         });
-//     }
-// };
-
-
 const addGuard = async (req, res, next) => {
   try {
       const guardData = { ...req.body };
@@ -290,7 +266,7 @@ const UploadGuardProfile = async (req, res) => {
     return res.status(400).send({ message: 'Please upload a file.' });
   }
 
-  const profileType = req.body.profileType || 'Guard'; // Default to 'Guard' if not provided
+  const profileType = req.body.profileType || 'Guard'; 
   let folder = '';
 
   if (profileType === 'Guard') {
@@ -446,5 +422,6 @@ const getAllGuardsByVendorId = async (req, res, next) => {
     updateGuard ,
     getAllGuardsByVendorId,
     UploadGuardProfile,
+    changePassword,
   };
   

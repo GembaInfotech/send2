@@ -56,26 +56,26 @@ const guardSchema = new Schema({
   },
 });
 
-guardSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    next();
-  }
-  const salt = await bcrypt.genSaltSync(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
+// guardSchema.pre("save", async function (next) {
+//   if (!this.isModified("password")) {
+//     next();
+//   }
+//   const salt = await bcrypt.genSaltSync(10);
+//   this.password = await bcrypt.hash(this.password, salt);
+// });
 
-guardSchema.methods.isPasswordMatched = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
-};
+// guardSchema.methods.isPasswordMatched = async function (enteredPassword) {
+//   return await bcrypt.compare(enteredPassword, this.password);
+// };
 
-guardSchema.methods.createPasswordResetToken = async function () {
-  const resetToken = crypto.randomBytes(32).toString("hex");
-  this.passwordResetToken = crypto
-    .createHash("sha256")
-    .update(resetToken)
-    .digest("hex");
-  this.passwordResetExpires = Date.now() + 30 * 60 * 1000; // 10 minutes
-  return resetToken;
-};
+// guardSchema.methods.createPasswordResetToken = async function () {
+//   const resetToken = crypto.randomBytes(32).toString("hex");
+//   this.passwordResetToken = crypto
+//     .createHash("sha256")
+//     .update(resetToken)
+//     .digest("hex");
+//   this.passwordResetExpires = Date.now() + 30 * 60 * 1000; // 10 minutes
+//   return resetToken;
+// };
 
 module.exports = mongoose.model("GuardModel", guardSchema);

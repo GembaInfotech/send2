@@ -13,6 +13,6 @@ router.route('/get-guards/:parkingId').get( guardController.getGuardsByParkingId
 router.route('/update-guard/:guardId').put( guardController.updateGuard);
 router.route('/get-guards-By-vendor-Id').get(decodeToken, guardController.getAllGuardsByVendorId);
 router.route('/upload-guard-profile').post(guardAuthentication,upload.single('profileImage'), guardController.UploadGuardProfile);
-
+router.route('/changePassword').post(guardAuthentication, guardController.changePassword)
 
 module.exports = router

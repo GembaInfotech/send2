@@ -12,10 +12,7 @@ const decodeToken = require("../middlewares/auth/decodeToken");
   router.route('/search').get(parkingController.view_Parking_list);
   router.route('/getParking/:parking_id').get(parkingController.get_parking_by_parkingId);
   router.route('/add-new-image').post(uploadParkingImages, parkingController.upload);
-  // router.route('/add-new-image/:id').post(upl)
   router.route('/update-parking/:parking_id').put(decodeToken, parkingController.update_parking);
-
-  //for admin panel
   router.route('/getvendorsParkings/:vendor_id').get(parkingController.get_parkings_by_vendorId);
 
   //for guard
