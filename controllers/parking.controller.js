@@ -6,6 +6,7 @@ const { updateParking } = require('../handlers/parkingHandler/updateParking')
 const { getParkingByParkingId } = require('../handlers/parkingHandler/getParkingByParkingId')
 const { getParkingByGuardId } = require('../handlers/parkingHandler/getParkingByGuardId')
 const {getParkingsByVendorId} = require('../handlers/parkingHandler/getParkingsByVendorId')
+const {sendParkingImages} = require('../handlers/parkingHandler/sendParkingImages')
 // const { approve } = require('../handlers/parkingHandler/approveParking')
 const { pending } = require('../handlers/parkingHandler/pendingHandler');
 const { upload } = require('../handlers/parkingHandler/upload');
@@ -104,5 +105,15 @@ exports.update_parking_status = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+exports.send_parking_images = async (req, res) => {
+  try {
+    await sendParkingImages(req, res);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
 
 

@@ -1,7 +1,8 @@
 const GuardModel = require('../models/guard.model')
 const ParkingModel = require('../models/parking.model')
-
-const bcrypt = require("bcrypt");
+const ForgetPassword = require('../models/forgetPassword.model.js')
+const crypto = require("crypto")
+const bcrypt = require('bcrypt')
 const jwt = require("jsonwebtoken");
 const vendorToken = require("../models/vendorToken.model")
 const guardToken = require("../models/guardToken.model")
@@ -12,10 +13,9 @@ const { findOne } = require('../models/parking.model');
 const { generateGaurdCode } = require('../handlers/codeHandler/Codes');
 dayjs.extend(duration);
 const path = require('path');
-
-
 const {sendVerificationEmail} = require('../utils/nodemailer.js')
 const { GuardAccountVerificationTemplate} = require ('../emailTemplate/GuardAccountVerificaton.js')
+const {GuardForgetPasswordTemplate} = require('../emailTemplate/GuardForgetPassword.js')
 
 
 const LOG_TYPE = {
@@ -276,14 +276,10 @@ const UploadGuardProfile = async (req, res) => {
   } else {
     return res.status(400).send({ message: 'Invalid profile type.' });
   }
-
-  // Update guard with the file name
   guard.profileImage = req.file.filename;
 
   try {
-    // Save the guard with the updated profile image
     await guard.save();
-
     res.send({
       message: 'File uploaded and saved successfully!',
       fileName: req.file.filename,
@@ -293,6 +289,18 @@ const UploadGuardProfile = async (req, res) => {
     res.status(500).send({ message: 'Error saving file info to guard profile.' });
   }
 };
+const sendProfile = async(req, res) =>{
+  const { image } = req.params;
+  const imagePath = path.join(__dirname,'..', 'ProfileImage', 'GuardProfileImg', image); 
+  console.log(imagePath);
+  
+
+  res.sendFile(imagePath, (err) => {
+    if (err) {
+      res.status(404).send('File not found');
+    }
+  });
+}
 const getGuard = async (req, res, next) => {
     try {
         const guardId = req.params.guardId; // Assuming the guard id is passed as req.params.id
@@ -356,7 +364,6 @@ const getGuardsByParkingId = async (req, res, next) => {
   }
 };
 
-
 const updateGuard = async (req, res, next) => {
     try {
       // const vendor = req.userId;
@@ -413,6 +420,135 @@ const getAllGuardsByVendorId = async (req, res, next) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Find guard by email
+    const guard = await GuardModel.findOne({ email });
+
+    // If guard not found, return 404
+    if (!guard) {
+      return res.status(404).json({ error: 'Guard not found' });
+    }
+
+    // Generate a random token
+    const forgetToken = crypto.randomBytes(20).toString('hex');
+
+    // Save the token in ForgetPassword collection
+    await ForgetPassword.create({
+      userId: guard._id,
+      email,
+      token: forgetToken,
+      verified: '0'
+    });
+
+    // Create reset URL
+    const resetUrl = `http://localhost:3000/#/reset-password/${forgetToken}/`;
+
+    // Data to be used in the email
+    const Data = {
+      email,
+      link: resetUrl
+    };
+
+    console.log("link", Data.link);
+
+    // Send the password reset email
+    const customizedTemplate = GuardForgetPasswordTemplate
+      .replace('%NAME%', guard.name)
+      .replace('%EMAIL%', Data.email)
+      .replace('%LINK%', Data.link);
+      sendVerificationEmail(guard, customizedTemplate);
+
+    // If email is sent, return success response
+    console.log("Password reset link has been sent to your email id");
+    return res.status(200).json({ message: "Password reset link has been sent to your email id", guard });
+  } catch (error) {
+    // Handle errors
+    console.log(error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const resetPasswordRedirect = async (req, res) => {
+  try {
+    let forgotToken = req.params.token; 
+    console.log(forgotToken);
+
+    // Find the token in the ForgetPassword collection
+    const data = await ForgetPassword.findOne({ token: forgotToken });
+
+    console.log("data", data);
+
+    // If no data is found or the token is already verified
+    if (!data || data.verified === "1") {
+      console.log("data", data);
+      log.dev("Wrong password reset link!", "");
+      return res.status(400).json({
+        message: "This link has expired or is incorrect!",
+      });
+    }
+
+    // If the token is valid and not yet used
+    console.log("Link verified", "");
+    return res.status(200).json({
+      message: "Link verified",
+    });
+
+  } catch (err) {
+    // Handle any errors
+    console.log("Something went wrong with reset_verify-- ", err);
+    return res.status(500).json({
+      message: "Something went wrong, please try again!",
+    });
+  }
+};
+
+function validatePW(str) {
+  if (str.length <= 5) return false;
+  if (!/[A-Z]/.test(str)) return false;
+  if (!/[a-z]/.test(str)) return false;
+  return true;
+}
+
+const resetPassword = async (req, res) => {
+  console.log("hello");
+  let forgotToken = req.body.token; 
+  let password = req.body.password;
+  let confirmPassword = req.body.confirmPassword;
+
+  if (password !== confirmPassword) {
+      return response.throw(202, "Passwords do not match!", "", res);
+  }
+
+  if (!validatePW(password)) {
+      return response.throw(500, "Invalid: Password doesn't meet the requirements", "", res);
+  }
+
+  try {
+      const data = await ForgetPassword.findOne({ token: forgotToken });
+      if (!data) {
+          return response.throw(201, "Please check password reset link", "", res);
+      }
+      const guard = await GuardModel.findOne({ email: data.email });
+      if (!guard) {
+          return response.throw(201, "User not found", "", res);
+      }
+      const saltRounds = 10;
+      const hash = bcrypt.hashSync(password, saltRounds);
+      await GuardModel.updateOne({ email: data.email }, { password: hash });
+      await ForgetPassword.updateOne({ token: forgotToken }, { verified: "1" });
+
+      return response.throw(200, "Password reset successfully!", "", res);
+
+  } catch (err) {
+      log.test("Something went wrong with reset_password", err);
+      return response.throw(201, "Something went wrong, please try again", "", res);
+  }
+};
+
+
   module.exports = {
     addGuard,
     signin,
@@ -423,5 +559,9 @@ const getAllGuardsByVendorId = async (req, res, next) => {
     getAllGuardsByVendorId,
     UploadGuardProfile,
     changePassword,
+    forgotPassword,
+    resetPasswordRedirect,
+    resetPassword,
+    sendProfile
   };
   

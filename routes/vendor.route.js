@@ -22,9 +22,14 @@ router.post("/refresh-token", vendorController.refreshToken);
 router.route('/gst-card').post(uploadPhoto.single('file'), parkingImgResize, vendorController.gstUpload);
 router.route('/business-licence').post(uploadPhoto.single('file'), parkingImgResize, vendorController.businessLicenceUpload);
 
-router.route('/pan-image').post(uploadMultipleForVendor, vendorController.panUpload);
-router.route('/adhaar-image').post(uploadMultipleForVendor, vendorController.adhaarUpload);
-// router.route('/profile-image').post(uploadPhoto.single('file'), parkingImgResize, vendorController.profileUpload);
+
 router.route('/profile-image').post(upload.single('profileImage'),vendorController.profileUpload);
+router.route('/send-profile/:image').get(vendorController.sendProfile);
+
+
+router.route('/upload-docs').post(uploadMultipleForVendor, vendorController.uploadDocs);
+router.route('/send-docs/:type/:image').get(vendorController.sendDocs);
+
+
 
 module.exports =router

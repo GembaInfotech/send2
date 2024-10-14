@@ -77,9 +77,9 @@ const VendorSchema = new Schema(
     adhaarImage: [{
       type: String
     }],
-    profileImage: [{
+    profileImage: {
       type: String
-    }],
+    },
 
     token: {
       type: String,

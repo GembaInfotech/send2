@@ -4,7 +4,7 @@ const bookingSchema = new mongoose.Schema({
   code:{
     type:String
   },
-  parking: { type: mongoose.Schema.Types.ObjectId, ref: 'Parking' },
+  parking: { type: mongoose.Schema.Types.ObjectId, ref: 'ParkingModel' },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   vehicleId: { type: mongoose.Schema.Types.ObjectId },
   vendor: { type: mongoose.Schema.Types.ObjectId, ref: 'VendorModel' },

@@ -1,7 +1,14 @@
+
+
+
 const vendorModel = require('../models/vendor.model')
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const path = require('path'); 
+const fs = require('fs');
+const { fromPath } = require("pdf2pic");
+const  pdftopic= require("pdftopic");
+
 const vendorToken = require("../models/vendorToken.model")
 const { saveLogInfo } = require("../middlewares/logger/logInfo");
 const duration = require("dayjs/plugin/duration");
@@ -395,50 +402,67 @@ const businessLicenceUpload = async (req, res) => {
   }
 };
 
-const panUpload = async (req, res) => {
-  const { id } = req.body; // Get the vendor ID from the request body
+const uploadDocs = async (req, res) => {
+  const { id, uploadType } = req.body; 
 
   try {
-    // Find the vendor by ID
     const vendor = await vendorModel.findById(id);
     if (!vendor) {
       return res.status(404).json({ success: false, message: 'Vendor not found for the given vendor ID' });
     }
 
-    // Check if the files were uploaded
-    if (!req.files || req.files.length === 0) { // Ensure req.files exists and is not empty
+    if (!req.files || req.files.length === 0) {
       return res.status(400).json({ success: false, message: 'Please upload a file.' });
     }
 
-    // Determine the folder based on upload type
-    const uploadType = req.body.uploadType; 
     let folder = '';
-
     switch (uploadType) {
       case 'vendorGST':
         folder = 'VendorGST';
+        vendor.gstImage = []; 
+        req.files.forEach(uploadedFile => {
+          const imagePath = uploadedFile.filename;
+          vendor.gstImage.push(imagePath); 
+        });
         break;
       case 'vendorAadhar':
         folder = 'VendorAadhar';
+        vendor.adhaarImage = []; 
+        req.files.forEach(uploadedFile => {
+          const imagePath = uploadedFile.filename;
+          vendor.adhaarImage.push(imagePath); 
+        });
         break;
       case 'vendorLicense':
         folder = 'VendorLicense';
+        vendor.licenseImage = []; 
+        req.files.forEach(uploadedFile => {
+          const imagePath = uploadedFile.filename;
+          vendor.licenseImage.push(imagePath); 
+        });
         break;
       case 'vendorPan':
         folder = 'VendorPan';
+        vendor.panImage = []; 
+        req.files.forEach(uploadedFile => {
+          const imagePath = uploadedFile.filename;
+          vendor.panImage.push(imagePath); // Push the new image path
+        });
+        break;
+      case 'vendorProfile':
+        folder = 'VendorProfile';
+        vendor.profileImage = []; // Replace the existing profileImage array
+        req.files.forEach(uploadedFile => {
+          const imagePath = uploadedFile.filename;
+          vendor.profileImage.push(imagePath); // Push the new image path
+        });
         break;
       default:
         return res.status(400).json({ success: false, message: 'Invalid upload type' });
     }
 
-    // Clear existing panImage array and prepare to add new images
-    vendor.panImage = []; // Replace existing images with an empty array
-    req.files.forEach(uploadedFile => {
-      const imagePath = path.join('ProfileImage', folder, uploadedFile.filename); 
-      vendor.panImage.push(imagePath); // Push the new image path to the array
-    });
-
-    await vendor.save(); // Save the updated vendor information
+    // Save the updated vendor information
+    await vendor.save();
 
     // Respond with success message and file information
     res.status(200).json({
@@ -452,57 +476,6 @@ const panUpload = async (req, res) => {
 
   } catch (error) {
     console.error(error); // Log the error for debugging
-    res.status(500).json({ success: false, message: 'Error updating vendor', error: error.message });
-  }
-};
-
-const adhaarUpload = async (req, res) => {
-  const { id } = req.body; 
-  try {
-    const vendor = await vendorModel.findById(id);
-    if (!vendor) {
-      return res.status(404).json({ success: false, message: 'Vendor not found for the given vendor ID' });
-    }
-    if (!req.files || req.files.length === 0) { 
-      return res.status(400).json({ success: false, message: 'Please upload a file.' });
-    }
-    const uploadType = req.body.uploadType; 
-    let folder = '';
-
-    switch (uploadType) {
-      case 'vendorGST':
-        folder = 'VendorGST';
-        break;
-      case 'vendorAadhar':
-        folder = 'VendorAadhar';
-        break;
-      case 'vendorLicense':
-        folder = 'VendorLicense';
-        break;
-      case 'vendorPan':
-        folder = 'VendorPan';
-        break;
-      default:
-        return res.status(400).json({ success: false, message: 'Invalid upload type' });
-    }
-    vendor.adhaarImage = []; 
-    req.files.forEach(uploadedFile => {
-      const imagePath = path.join('ProfileImage', folder, uploadedFile.filename); 
-      vendor.adhaarImage.push(imagePath); 
-    });
-
-    await vendor.save(); 
-    res.status(200).json({
-      success: true,
-      message: 'Files uploaded and saved successfully!',
-      files: req.files.map(file => ({
-        fileName: file.filename,
-        filePath: path.join('ProfileImage', folder, file.filename),
-      })), 
-    });
-
-  } catch (error) {
-    console.error(error); 
     res.status(500).json({ success: false, message: 'Error updating vendor', error: error.message });
   }
 };
@@ -529,18 +502,157 @@ const profileUpload = async (req, res) => {
     } else {
       return res.status(400).json({ message: 'Invalid profile type.' });
     }
-    vendor.profileImage = path.join('ProfileImage', folder, req.file.filename);
+    vendor.profileImage = req.file.filename ;
     await vendor.save();
     res.json({
       message: 'File uploaded and saved successfully!',
-      fileName: req.file.filename,
-      filePath: vendor.profileImage, 
+      // fileName: req.file.filename,
+      // filePath: path.join('ProfileImage', folder, req.file.filename), 
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error saving file info to vendor profile.', error });
   }
 };
+
+const sendProfile = async(req, res) =>{
+  const { image } = req.params;
+  const imagePath = path.join(__dirname,'..', 'ProfileImage', 'VendorProfileImg', image); 
+  console.log(imagePath);
+  
+
+  res.sendFile(imagePath, (err) => {
+    if (err) {
+      res.status(404).send('File not found');
+    }
+  });
+}
+
+
+// const { fromPath } = require('pdf2pic');
+// const fs = require('fs');
+// const path = require('path');
+
+const sendDocs = async (req, res) => {
+  console.log("hello");
+  
+  const { type, image } = req.params;
+
+  console.log("image", type);
+  console.log(image);
+
+  let pdfPath;
+  switch (type) {
+    case "profile":
+      pdfPath = path.join(__dirname, '..', 'ProfileImage', 'VendorProfileImg', image);
+      break;
+    case "aadhar":
+      pdfPath = path.join(__dirname, '..', 'ProfileImage', 'VendorAadhar', image);
+      console.log(pdfPath);
+      break;
+    case "gst":
+      pdfPath = path.join(__dirname, '..', 'ProfileImage', 'VendorGST', image);
+      break;
+    case "pan":
+      pdfPath = path.join(__dirname, '..', 'ProfileImage', 'VendorPan', image);
+      break;
+    default:
+      return res.status(400).json({ message: "Invalid type" });
+  }
+
+  console.log(`PDF Path: ${pdfPath}`);
+// ********
+const options = {
+  density: 100,
+  saveFilename: "first_page",
+  savePath: "./images",
+  format: "png",
+  width: 800,
+  height: 1000,
+};
+
+const storeAsImage = fromPath(pdfPath, options);
+
+try {
+  const result = await storeAsImage(1); // Converts the first page
+  const imagePath = result.path; // The path to the saved image
+
+  // Serve the image file in response
+  if (fs.existsSync(imagePath)) {
+    res.sendFile(path.resolve(imagePath));
+  } else {
+    res.status(404).send("Image not found");
+  }
+} catch (error) {
+  console.error("Error converting PDF to image:", error);
+  res.status(500).send("Internal Server Error");
+}
+
+// return res.send("ok")
+return;
+
+
+
+
+  // ***
+  // const options = {
+  //   density: 100, // Image resolution
+  //   saveFilename: image, // Save image name
+  //   savePath: "./images", // Save image to this directory
+  //   format: "png", // Output format
+  //   width: 600, // Width of image
+  //   height: 800, // Height of image
+  // };
+
+  // const convert = fromPath(pdfPath, options);
+
+  // try {
+  //   // Convert first page of PDF to image
+  //   const page1 = await convert(1); // Convert first page
+
+  //   // Read the image file and send it as a response
+  //   const imageBuffer = fs.readFileSync(page1.path);
+  //   res.contentType("image/png");
+  //   res.send(imageBuffer);
+  // } catch (err) {
+  //   res.status(500).send("Error converting PDF to image");
+  // }
+  return;
+  // Convert the first page of the PDF to an image
+  // const outputDir = path.join(__dirname, '..', 'ProfileImage', 'PreviewImages');
+
+  // Ensure the output directory exists
+  // if (!fs.existsSync(outputDir)) {
+  //   fs.mkdirSync(outputDir, { recursive: true });
+  // }
+
+  // const outputImagePath = path.join(outputDir, `${path.basename(image, '.pdf')}-0.png`);
+
+  // console.log("outputImagePath", outputImagePath);
+  
+  // try {
+  //   // Check if the image is already generated
+  //   if (!fs.existsSync(outputImagePath)) {
+  //     console.log(`Generating preview for: ${pdfPath}`);
+      
+  //     // Convert the first page of the PDF
+  //     await convert(1); // 1 for the first page
+
+  //     console.log("Image generated successfully");
+  //   }
+
+  //   // Send the image to the frontend
+  //   res.sendFile(outputImagePath, (err) => {
+  //     if (err) {
+  //       res.status(404).send('Preview image not found');
+  //     }
+  //   });
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).json({ message: 'Error generating PDF preview', error: error.message });
+  // }
+};
+
 
 module.exports = {
   addVendor,
@@ -555,7 +667,8 @@ module.exports = {
   refreshToken,
   gstUpload,
   businessLicenceUpload,
-  panUpload,
-  adhaarUpload,
-  profileUpload
+  uploadDocs,
+  profileUpload,
+  sendProfile,
+  sendDocs
 };
