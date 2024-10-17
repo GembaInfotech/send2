@@ -8,9 +8,10 @@ const { getParkingByGuardId } = require('../handlers/parkingHandler/getParkingBy
 const {getParkingsByVendorId} = require('../handlers/parkingHandler/getParkingsByVendorId')
 const {sendParkingImages} = require('../handlers/parkingHandler/sendParkingImages')
 // const { approve } = require('../handlers/parkingHandler/approveParking')
-const { pending } = require('../handlers/parkingHandler/pendingHandler');
+const { getParkingByVendorIdAndStatus } = require('../handlers/parkingHandler/getParkingByVendorIdAndStatusHandler');
 const { upload } = require('../handlers/parkingHandler/upload');
 const { approve } = require('../handlers/parkingHandler/approveParking');
+const {getAllParkings} = require('../handlers/parkingHandler/getAllParkings')
 exports.view_Parking_list = async (req, res) => {
   try {
     await viewParkingList(req, res);
@@ -34,10 +35,9 @@ exports.get_parking_by_parkingId = async (req, res) => {
   }
 };
 
-exports.pending = async (req, res) => {
+exports.get_arking_by_vendorId_and_status = async (req, res) => {
   try {
-    console.log("hey....");
-    await pending(req, res);
+    await getParkingByVendorIdAndStatus(req, res);
   }
   catch (err) {
     res.status(500).json(err)
@@ -115,5 +115,12 @@ exports.send_parking_images = async (req, res) => {
 };
 
 
+exports.get_all_parkings = async (req, res) => {
+  try {
+    await getAllParkings(req, res);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 
