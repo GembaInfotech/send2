@@ -284,17 +284,16 @@ const getAllVendor = async (req, res, next) => {
   }
 };
 
-const getVendors = async(req, res, next) => {
-  console.log("get vendors");
-  const createdBy = req.query.createdBy;
-  console.log(createdBy)
+const getVendors = async (req, res, next) => {
   try {
-    const vendors = await vendorModel.find({ createdBy });
+    // Fetch vendors and select only the fields you need
+    const vendors = await vendorModel.find().select('_id code firstName lastName');
     res.json(vendors);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 }
+
 
 const refreshToken = async (req, res) => {
   try {

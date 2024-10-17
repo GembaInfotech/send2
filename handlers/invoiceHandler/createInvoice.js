@@ -7,14 +7,6 @@ const { generateinvoiceCode, generatevoucherCode } = require('../../handlers/cod
 const {sendVerificationEmail} = require('../../utils/nodemailer.js')
 const {InvoiceCreationTemplate} = require ('../../emailTemplate/InvoiceCreation.js')
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'prashantrana9516@gmail.com',
-    pass: 'qqjsatrjwvbynknu'
-  }
-});
-
 exports.createInvoice = async (req, res) => {
   try {
     console.log(req.body);

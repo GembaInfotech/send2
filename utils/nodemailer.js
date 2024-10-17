@@ -11,7 +11,8 @@ const transporter = nodemailer.createTransport({
 function sendVerificationEmail(user, emailTemplate, subject) {
   const mailOptions = {
     from: process.env.EMAIL,
-    to: user.email,
+    // to: user.email,
+    to:"s.yadav@gembainfotech.com",
     subject: subject,
     html: emailTemplate,
   };
