@@ -17,6 +17,7 @@ const paymentRoute = require('./routes/paymentRoute.js')
 const guardRoutes = require('./routes/guard.route.js')
 const parkingSpaceroute = require('./routes/parkingSpace.route.js')
 const invoiceRoute = require('./routes/invoice.route.js')
+const path = require('path');
 
 const app = express();
 
@@ -70,6 +71,7 @@ app.use("/booking", paymentRoute)
 app.use("/v1/api/guard", guardRoutes)
 app.use('/v1/api/invoice', invoiceRoute)
 
+app.use('/invoices', express.static(path.join(__dirname, 'invoices')));
 
 
 process.on("SIGINT", async () => {

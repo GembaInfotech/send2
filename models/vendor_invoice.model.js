@@ -45,23 +45,9 @@ const VendorInvoiceSchema = new Schema(
       type: String,
     },
     vendor_id: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: 'VendorModel',
       required: true,
-    },
-    vendor_name: {
-      type: String,
-    },
-    vendor_address: {
-      type: String,
-    },
-    vendor_PAN: {
-      type: String,
-    },
-    vendor_gstIn: {
-      type: String,
-    },
-    vendor_region: {
-      type: String,
     },
   },
   { timestamps: true }

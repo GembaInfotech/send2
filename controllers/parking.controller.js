@@ -114,7 +114,6 @@ exports.send_parking_images = async (req, res) => {
   }
 };
 
-
 exports.get_all_parkings = async (req, res) => {
   try {
     await getAllParkings(req, res);

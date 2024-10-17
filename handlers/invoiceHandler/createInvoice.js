@@ -6,6 +6,10 @@ const nodemailer = require('nodemailer');
 const { generateinvoiceCode, generatevoucherCode } = require('../../handlers/codeHandler/Codes');
 const {sendVerificationEmail} = require('../../utils/nodemailer.js')
 const {InvoiceCreationTemplate} = require ('../../emailTemplate/InvoiceCreation.js')
+const fs = require('fs');
+const path = require('path');
+
+const { generateInvoicePDF } = require('../../controllers/pdfController'); 
 
 exports.createInvoice = async (req, res) => {
   try {
@@ -69,23 +73,48 @@ exports.createInvoice = async (req, res) => {
           total_amount: totalAmount.toFixed(2),  // Ensure to format to two decimal places
           description: `Invoice for vendor ${vendor.vendorName}`,
           vendor_id: vendor.vendorId,
+        };
+
+        const invoiceVendor = {
+          invoice_no: invoiceId,
+          invoice_date: new Date().toISOString().split('T')[0],
+          from_date: startDate,
+          to_date: endDate,
+          unit_of: 'No.',
+          quantity: selectedBookingIds.length,
+          amount: amount.toFixed(2),  // Ensure to format to two decimal places
+          total_Tax: total_Tax.toFixed(2),  // Ensure to format to two decimal places
+          total_amount: totalAmount.toFixed(2),  // Ensure to format to two decimal places
+          description: `Invoice for vendor ${vendor.vendorName}`,
+          vendor_id: vendor.vendorId,
           vendor_name: `${vendorDetails.firstName} ${vendorDetails.lastName}`,
           vendor_address: `${vendorDetails.billingAddress.address} ${vendorDetails.billingAddress.postalCode} ${vendorDetails.billingAddress.city} ${vendorDetails.billingAddress.state} ${vendorDetails.billingAddress.country}`,
           vendor_PAN: vendorDetails.panNo,
           vendor_gstIn: vendorDetails.gstNo,
           vendor_region: vendorDetails.region,
-          invoice_link: `http://localhost:5173/invoice#/invoice/${invoiceId}`
         };
 
-        // Dear ${vendorDetails.firstName},\n\nYour invoice is ready for ${startDate} to ${endDate}. You can download it from the following link:\n\n${invoice.invoice_link}\n\nBest regards,\nYour Company
+        const pdfBuffer = await generateInvoicePDF(invoiceVendor);
+        const invoicesDir = path.join(__dirname, '../../invoices'); 
+        if (!fs.existsSync(invoicesDir)) {
+          fs.mkdirSync(invoicesDir, { recursive: true });
+        }
+    
+        // Save the PDF file on the server
+        const pdfPath = path.join(invoicesDir, `invoice_${invoiceVendor.invoice_no}.pdf`);
+        fs.writeFileSync(pdfPath, pdfBuffer);
+    
+        // Send the download link back to the frontend
+        const downloadLink = `http://localhost:3456/invoices/invoice_${invoiceVendor.invoice_no}.pdf`;
 
         invoices.push(invoice);
+
 
         const customizedTemplate = InvoiceCreationTemplate
         .replace('%NAME%', vendorDetails.firstName)
         .replace('%FROM%', startDate)
         .replace('%TO%', endDate)
-        .replace('%LINK%', invoice.invoice_link);
+        .replace('%LINK%', downloadLink);
               sendVerificationEmail(vendorDetails, customizedTemplate);
       }
     }
