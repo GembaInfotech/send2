@@ -3,9 +3,9 @@ const path = require('path');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log(req.body.uploadType);
+        console.log(req?.body?.uploadType);
         
-        let uploadType = req.body.uploadType; 
+        let uploadType = req?.body?.uploadType; 
         console.log(req.body);
         
         let folder = '';

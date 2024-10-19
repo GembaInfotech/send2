@@ -172,6 +172,17 @@ const logout = async (req, res) => {
   }
 };
 
+const getVendorDetails = async (req, res, next) => {
+  try {
+    console.log("hello");
+    const {vendorId} = req.params
+    const vendor = await vendorModel.findById({_id:vendorId}).select("-password").lean();
+    res.status(200).json(vendor);
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getVendor = async (req, res, next) => {
   try {
     console.log("hello");
@@ -186,6 +197,7 @@ const getVendor = async (req, res, next) => {
 const addVendor = async (req, res, next) => {
   try {
     const vendorData = { ...req.body };
+    console.log("vendorData", vendorData)
 
     const existingVendor = await vendorModel.findOne({ email: vendorData.email });
     if (existingVendor) {
@@ -274,10 +286,13 @@ const updateVendorStatus = async (req, res, next) => {
 
 const getAllVendor = async (req, res, next) => {
   // console.log("gte's vendors")
-  const gteId = req.params.gteId;
+  const gteId = req.query.createdBy;
   // console.log(gteId)
   try {
     const vendors = await vendorModel.find({ createdBy: gteId });
+    const vendorsCount = await vendorModel.find({ createdBy: gteId }).countDocuments();
+    console.log("vendor counting......", vendorsCount)
+
     res.json(vendors);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -403,6 +418,8 @@ const businessLicenceUpload = async (req, res) => {
 
 const uploadDocs = async (req, res) => {
   const { id, uploadType } = req.body; 
+  console.log("hdhjdje", req.body);
+  
 
   try {
     const vendor = await vendorModel.findById(id);
@@ -669,5 +686,6 @@ module.exports = {
   uploadDocs,
   profileUpload,
   sendProfile,
-  sendDocs
+  sendDocs,
+  getVendorDetails
 };

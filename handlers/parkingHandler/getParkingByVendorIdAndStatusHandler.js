@@ -19,6 +19,7 @@ exports.getParkingByVendorIdAndStatus = async (req, res) => {
       query.status = status; 
     }
     const parking = await ParkingModel.find(query).populate('vendor_id', 'code firstName lastName email');  
+    // console.log("parking", parking)
     res.status(200).json({
       success: true,
       data: parking,

@@ -9,8 +9,10 @@ const uploadMultipleForVendor = require('../utils/UploadImage/uploadMultiple')
 router.route('/create-new-vendor').post(vendorController.addVendor);
 router.route('/vendor-login').post( vendorController.signin);
 router.route('/get-vendor').get(decodeToken,vendorController.getVendor);
+router.route('/get-vendor_details/:vendorId').get(vendorController.getVendorDetails);
 
-router.route('/get-all-vendor/:gteId').get(vendorController.getAllVendor);
+
+router.route('/get-all-vendor').get(vendorController.getAllVendor);
 router.route('/get-all-vendors').get(vendorController.getVendors);
 
 router.route('/update-vendor').put(decodeToken,vendorController.updateVendor);
