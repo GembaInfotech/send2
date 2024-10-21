@@ -4,10 +4,11 @@
 const vendorModel = require('../models/vendor.model')
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const path = require('path'); 
+const path = require('path');
 const fs = require('fs');
 const { fromPath } = require("pdf2pic");
-const  pdftopic= require("pdftopic");
+const pdftopic = require("pdftopic");
+
 
 const vendorToken = require("../models/vendorToken.model")
 const { saveLogInfo } = require("../middlewares/logger/logInfo");
@@ -17,7 +18,7 @@ const { findOne } = require('../models/parking.model');
 const { generatevendorCode } = require('../handlers/codeHandler/Codes');
 dayjs.extend(duration);
 const { sendVerificationEmail } = require('../utils/nodemailer.js');
-const {VendorAccountVerificationTemplate} = require('../emailTemplate/VendorAccountVerification.js')
+const { VendorAccountVerificationTemplate } = require('../emailTemplate/VendorAccountVerification.js')
 
 
 const LOG_TYPE = {
@@ -96,7 +97,7 @@ const signin = async (req, res, next) => {
       email: existingVendor.email,
     };
 
-  
+
 
     const accessToken = jwt.sign(payload, process.env.SECRET, {
       expiresIn: "30m",
@@ -151,7 +152,7 @@ const signin = async (req, res, next) => {
 
 const logout = async (req, res) => {
   try {
-      const vendor = req.userId
+    const vendor = req.userId
     if (vendor) {
       await vendorToken.deleteOne({ vendor });
       await saveLogInfo(
@@ -175,8 +176,8 @@ const logout = async (req, res) => {
 const getVendorDetails = async (req, res, next) => {
   try {
     console.log("hello");
-    const {vendorId} = req.params
-    const vendor = await vendorModel.findById({_id:vendorId}).select("-password").lean();
+    const { vendorId } = req.params
+    const vendor = await vendorModel.findById({ _id: vendorId }).select("-password").lean();
     res.status(200).json(vendor);
   } catch (err) {
     next(err);
@@ -193,37 +194,38 @@ const getVendor = async (req, res, next) => {
     next(err);
   }
 };
-
 const addVendor = async (req, res, next) => {
   try {
     const vendorData = { ...req.body };
-    console.log("vendorData", vendorData)
-
     const existingVendor = await vendorModel.findOne({ email: vendorData.email });
     if (existingVendor) {
       return res.status(400).json({
         message: "Email already exists",
       });
     }
-
     const hashedPassword = await bcrypt.hash(vendorData.password, 10);
-
     const code = await generatevendorCode();
-
+    const gstImage = req.files['gstDocument'] && req.files['gstDocument'][0] ? req.files['gstDocument'][0].filename : null;
+    const adhaarImage = req.files['aadhaarDocument'] && req.files['aadhaarDocument'][0] ? req.files['aadhaarDocument'][0].filename : null;
+    const businessLicenseImage = req.files['businessLicenseDocument'] && req.files['businessLicenseDocument'][0] ? req.files['businessLicenseDocument'][0].filename : null;
+    const panImage = req.files['panDocument'] && req.files['panDocument'][0] ? req.files['panDocument'][0].filename : null;
     const newVendor = new vendorModel({
       code,
       ...vendorData,
       password: hashedPassword,
+      gstImage: gstImage ? [gstImage] : [], // Store as an array
+      adhaarImage: adhaarImage ? [adhaarImage] : [], // Corrected key from adhaarImage to aadhaarImage
+      businessLicenceImage: businessLicenseImage ? [businessLicenseImage] : [],
+      panImage: panImage ? [panImage] : []
     });
-
-    await newVendor.save();  
-      const customizedTemplate = VendorAccountVerificationTemplate
+    await newVendor.save();
+    const customizedTemplate = VendorAccountVerificationTemplate
       .replace('%NAME%', newVendor.firstName)
       .replace('%EMAIL%', newVendor.email)
       .replace('%PASSWORD%', vendorData.password)
       .replace('%LINK%', 'http://localhost:5173/');
-            sendVerificationEmail(newVendor, customizedTemplate);
-    
+
+    sendVerificationEmail(newVendor, customizedTemplate);
     res.status(200).json({
       data: newVendor,
     });
@@ -235,6 +237,40 @@ const addVendor = async (req, res, next) => {
     });
   }
 };
+
+
+const getPdf = async(req, res) => {
+  const { docType, fileName } = req.params;
+  console.log(req.params);
+  
+
+  if (!docType || !fileName) {
+      return res.status(400).json({ message: 'Document type and filename are required' });
+  }
+
+  // Map document types to their respective folders
+  const docFolders = {
+      gst: 'VendorGST',
+      license: 'VendorLicense',
+      pan: 'VendorPan',
+      aadhaar: 'VendorAadhar'
+  };
+
+  const folderName = docFolders[docType.toLowerCase()]; // Get the folder name from the mapping
+  if (!folderName) {
+      return res.status(400).json({ message: 'Invalid document type' });
+  }
+
+  const directoryPath = path.join(__dirname, '../ProfileImage', folderName); // Construct the path
+
+  // Send the file
+  res.sendFile(path.join(directoryPath, fileName), (err) => {
+      if (err) {
+          console.error(err);
+          res.status(404).send('File not found');
+      }
+  });
+}
 
 const updateVendor = async (req, res, next) => {
   try {
@@ -363,14 +399,14 @@ const refreshToken = async (req, res) => {
 const gstUpload = async (req, res) => {
   try {
 
-    const {id} = req.body;
+    const { id } = req.body;
     const isValidVendor = await vendorModel.exists({ _id: id });
     console.log(isValidVendor);
     if (!isValidVendor) {
       return res.status(404).json({ success: false, message: 'Vendor not found for the given vendor ID' });
     }
-    const updatedVendor = await vendorModel.findByIdAndUpdate(id, 
-      { $push: { gstImage : req?.imagepath.url } }
+    const updatedVendor = await vendorModel.findByIdAndUpdate(id,
+      { $push: { gstImage: req?.imagepath.url } }
 
       , { new: true });
     console.log(updatedVendor);
@@ -381,16 +417,16 @@ const gstUpload = async (req, res) => {
 
     res.status(200).json({ success: true, message: 'Vendor updated successfully', vendor: updatedVendor });
   } catch (error) {
-      console.log(error)
+    console.log(error)
     res.status(500).json({ success: false, message: 'Error updating vendor', error: error.message });
   }
 };
 
 const businessLicenceUpload = async (req, res) => {
   try {
-      // console.log(req.body, req.params, req.userId);
-      const {id} = req.body;
-      console.log(id);
+    // console.log(req.body, req.params, req.userId);
+    const { id } = req.body;
+    console.log(id);
     // Check if the vendor ID is valid
     const isValidVendor = await vendorModel.exists({ _id: id });
     console.log(isValidVendor);
@@ -399,8 +435,8 @@ const businessLicenceUpload = async (req, res) => {
     }
 
     // Update the parking
-    const updatedVendor = await vendorModel.findByIdAndUpdate(id, 
-      { $push: { businessLicenceImage : req?.imagepath.url } }
+    const updatedVendor = await vendorModel.findByIdAndUpdate(id,
+      { $push: { businessLicenceImage: req?.imagepath.url } }
 
       , { new: true });
     console.log(updatedVendor);
@@ -411,15 +447,15 @@ const businessLicenceUpload = async (req, res) => {
 
     res.status(200).json({ success: true, message: 'Vendor updated successfully', vendor: updatedVendor });
   } catch (error) {
-      console.log(error)
+    console.log(error)
     res.status(500).json({ success: false, message: 'Error updating vendor', error: error.message });
   }
 };
 
 const uploadDocs = async (req, res) => {
-  const { id, uploadType } = req.body; 
+  const { id, uploadType } = req.body;
   console.log("hdhjdje", req.body);
-  
+
 
   try {
     const vendor = await vendorModel.findById(id);
@@ -435,31 +471,31 @@ const uploadDocs = async (req, res) => {
     switch (uploadType) {
       case 'vendorGST':
         folder = 'VendorGST';
-        vendor.gstImage = []; 
+        vendor.gstImage = [];
         req.files.forEach(uploadedFile => {
           const imagePath = uploadedFile.filename;
-          vendor.gstImage.push(imagePath); 
+          vendor.gstImage.push(imagePath);
         });
         break;
       case 'vendorAadhar':
         folder = 'VendorAadhar';
-        vendor.adhaarImage = []; 
+        vendor.adhaarImage = [];
         req.files.forEach(uploadedFile => {
           const imagePath = uploadedFile.filename;
-          vendor.adhaarImage.push(imagePath); 
+          vendor.adhaarImage.push(imagePath);
         });
         break;
       case 'vendorLicense':
         folder = 'VendorLicense';
-        vendor.licenseImage = []; 
+        vendor.licenseImage = [];
         req.files.forEach(uploadedFile => {
           const imagePath = uploadedFile.filename;
-          vendor.licenseImage.push(imagePath); 
+          vendor.licenseImage.push(imagePath);
         });
         break;
       case 'vendorPan':
         folder = 'VendorPan';
-        vendor.panImage = []; 
+        vendor.panImage = [];
         req.files.forEach(uploadedFile => {
           const imagePath = uploadedFile.filename;
           vendor.panImage.push(imagePath); // Push the new image path
@@ -487,7 +523,7 @@ const uploadDocs = async (req, res) => {
       files: req.files.map(file => ({
         fileName: file.filename,
         filePath: path.join('ProfileImage', folder, file.filename),
-      })), 
+      })),
     });
 
   } catch (error) {
@@ -497,9 +533,9 @@ const uploadDocs = async (req, res) => {
 };
 
 const profileUpload = async (req, res) => {
-  const {id} = req.body;
+  const { id } = req.body;
   try {
-    const vendor = await vendorModel.findById({_id:id});
+    const vendor = await vendorModel.findById({ _id: id });
 
     if (!vendor) {
       return res.status(404).json({ success: false, message: 'Vendor not found for the given vendor ID' });
@@ -508,7 +544,7 @@ const profileUpload = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: 'Please upload a file.' });
     }
-    const profileType = req.body.type || 1; 
+    const profileType = req.body.type || 1;
     let folder = '';
 
     if (profileType === 2) {
@@ -518,7 +554,7 @@ const profileUpload = async (req, res) => {
     } else {
       return res.status(400).json({ message: 'Invalid profile type.' });
     }
-    vendor.profileImage = req.file.filename ;
+    vendor.profileImage = req.file.filename;
     await vendor.save();
     res.json({
       message: 'File uploaded and saved successfully!',
@@ -531,11 +567,11 @@ const profileUpload = async (req, res) => {
   }
 };
 
-const sendProfile = async(req, res) =>{
+const sendProfile = async (req, res) => {
   const { image } = req.params;
-  const imagePath = path.join(__dirname,'..', 'ProfileImage', 'VendorProfileImg', image); 
+  const imagePath = path.join(__dirname, '..', 'ProfileImage', 'VendorProfileImg', image);
   console.log(imagePath);
-  
+
 
   res.sendFile(imagePath, (err) => {
     if (err) {
@@ -551,7 +587,7 @@ const sendProfile = async(req, res) =>{
 
 const sendDocs = async (req, res) => {
   console.log("hello");
-  
+
   const { type, image } = req.params;
 
   console.log("image", type);
@@ -577,35 +613,35 @@ const sendDocs = async (req, res) => {
   }
 
   console.log(`PDF Path: ${pdfPath}`);
-// ********
-const options = {
-  density: 100,
-  saveFilename: "first_page",
-  savePath: "./images",
-  format: "png",
-  width: 800,
-  height: 1000,
-};
+  // ********
+  const options = {
+    density: 100,
+    saveFilename: "first_page",
+    savePath: "./images",
+    format: "png",
+    width: 800,
+    height: 1000,
+  };
 
-const storeAsImage = fromPath(pdfPath, options);
+  const storeAsImage = fromPath(pdfPath, options);
 
-try {
-  const result = await storeAsImage(1); // Converts the first page
-  const imagePath = result.path; // The path to the saved image
+  try {
+    const result = await storeAsImage(1); // Converts the first page
+    const imagePath = result.path; // The path to the saved image
 
-  // Serve the image file in response
-  if (fs.existsSync(imagePath)) {
-    res.sendFile(path.resolve(imagePath));
-  } else {
-    res.status(404).send("Image not found");
+    // Serve the image file in response
+    if (fs.existsSync(imagePath)) {
+      res.sendFile(path.resolve(imagePath));
+    } else {
+      res.status(404).send("Image not found");
+    }
+  } catch (error) {
+    console.error("Error converting PDF to image:", error);
+    res.status(500).send("Internal Server Error");
   }
-} catch (error) {
-  console.error("Error converting PDF to image:", error);
-  res.status(500).send("Internal Server Error");
-}
 
-// return res.send("ok")
-return;
+  // return res.send("ok")
+  return;
 
 
 
@@ -645,12 +681,12 @@ return;
   // const outputImagePath = path.join(outputDir, `${path.basename(image, '.pdf')}-0.png`);
 
   // console.log("outputImagePath", outputImagePath);
-  
+
   // try {
   //   // Check if the image is already generated
   //   if (!fs.existsSync(outputImagePath)) {
   //     console.log(`Generating preview for: ${pdfPath}`);
-      
+
   //     // Convert the first page of the PDF
   //     await convert(1); // 1 for the first page
 
@@ -687,5 +723,6 @@ module.exports = {
   profileUpload,
   sendProfile,
   sendDocs,
-  getVendorDetails
+  getVendorDetails,
+  getPdf
 };

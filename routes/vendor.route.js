@@ -3,10 +3,21 @@ const router = require("express").Router();
 const vendorController = require("../controllers/vendor.controller")
 const decodeToken = require("../middlewares/auth/decodeToken");
 const { uploadPhoto, parkingImgResize } = require("../middlewares/ImageUpload/upload");
-const upload = require("../utils/UploadImage/upload")
-const uploadMultipleForVendor = require('../utils/UploadImage/uploadMultiple')
+// const upload = require("../utils/UploadImage/upload")
+const upload = require('../utils/UploadImage/uploadMultiple')
 
-router.route('/create-new-vendor').post(vendorController.addVendor);
+// router.route('/create-new-vendor').post(vendorController.addVendor);
+router.route('/create-new-vendor').post(
+    upload.fields([
+      { name: 'gstDocument', maxCount: 1 },          // Field for GST document
+      { name: 'aadhaarDocument', maxCount: 1 },      // Field for Aadhaar document
+      { name: 'businessLicenseDocument', maxCount: 1 }, // Field for business license document
+      { name: 'panDocument', maxCount: 1 },           // Field for PAN document
+    ]),
+    vendorController.addVendor // Call the addVendor controller
+  );
+
+router.route('/getPdf/:docType/:fileName').get(vendorController.getPdf)
 router.route('/vendor-login').post( vendorController.signin);
 router.route('/get-vendor').get(decodeToken,vendorController.getVendor);
 router.route('/get-vendor_details/:vendorId').get(vendorController.getVendorDetails);
@@ -29,7 +40,7 @@ router.route('/profile-image').post(upload.single('profileImage'),vendorControll
 router.route('/send-profile/:image').get(vendorController.sendProfile);
 
 
-router.route('/upload-docs').post(uploadMultipleForVendor, vendorController.uploadDocs);
+// router.route('/upload-docs').post(uploadMultipleForVendor, vendorController.uploadDocs);
 router.route('/send-docs/:type/:image').get(vendorController.sendDocs);
 
 
